@@ -26,6 +26,7 @@
             overflow-x: hidden;
             overflow-y: hidden;
             position: relative;
+            margin: 0 auto;
         }
         
         .game-section {
@@ -35,7 +36,7 @@
             align-items: center;
             padding: 0 2rem;
             position: relative;
-            max-width: 600px;
+            max-width: 1000px;
             width: 100%;
         }
         
@@ -153,11 +154,14 @@
         
         .wheel-container {
             position: relative;
-            width: 500px;
-            height: 500px;
+            width: 600px;
+            height: 600px;
             margin: 2rem auto;
-            min-width: 400px;
-            min-height: 400px;
+            min-width: 500px;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .roulette-wheel {
@@ -582,7 +586,7 @@
             justify-content: center;
             text-align: center;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
         
@@ -648,8 +652,8 @@
             }
             
             .wheel-container {
-                width: 350px;
-                height: 350px;
+                width: 450px;
+                height: 450px;
             }
             
             .winner-name {
@@ -930,15 +934,15 @@
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('width', '100%');
             svg.setAttribute('height', '100%');
-            svg.setAttribute('viewBox', '0 0 500 500');
+            svg.setAttribute('viewBox', '0 0 600 600');
             svg.style.position = 'absolute';
             svg.style.top = '0';
             svg.style.left = '0';
             svg.style.zIndex = '5';
             
-            const centerX = 250;
-            const centerY = 250;
-            const radius = 240;
+            const centerX = 300;
+            const centerY = 300;
+            const radius = 290;
             const anglePerSection = 360 / totalSections;
             
             // Create sections based on number of players
@@ -987,7 +991,7 @@
                 textElement.style.transformOrigin = 'center';
                 
                 // Use consistent font size for all text
-                textElement.style.fontSize = '1rem';
+                textElement.style.fontSize = '1.2rem';
                 
                 // Add text overflow handling
                 textElement.style.overflow = 'hidden';
