@@ -124,8 +124,11 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
-            border: 8px solid #333;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border: 6px solid #2c3e50;
+            box-shadow: 
+                0 0 20px rgba(0,0,0,0.3),
+                inset 0 0 20px rgba(0,0,0,0.1);
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
             transition: transform 4s cubic-bezier(0.23, 1, 0.320, 1);
         }
         
@@ -147,18 +150,38 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 1rem;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,1), -1px -1px 2px rgba(0,0,0,1);
-            word-wrap: break-word;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
             text-align: center;
             line-height: 1.2;
-            max-width: 100%;
-            overflow: visible;
+            overflow: hidden;
             z-index: 10;
-            padding: 10px;
+            padding: 6px;
             box-sizing: border-box;
+            border: 1px solid rgba(44, 62, 80, 0.1);
+        }
+        
+        .wheel-section .section-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75%;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+            text-shadow: inherit;
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .wheel-center {
@@ -166,31 +189,45 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            background: #333;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 1.2rem;
         }
         
         .pointer {
             position: absolute;
-            top: -15px;
+            top: -20px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #e74c3c;
+            z-index: 25;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+        
+        .pointer::before {
+            content: '';
+            position: absolute;
+            top: -45px;
+            left: -15px;
+            width: 0;
+            height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 30px solid #ffd700;
-            z-index: 25;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            border-top: 15px solid #c0392b;
         }
         
         .spin-button {
@@ -506,6 +543,13 @@
             document.getElementById('playersTextarea').value = '';
         }
         
+        // Calculate text rotation to keep names upright
+        function calculateTextRotation(sectionIndex, totalSections) {
+            const sectionAngle = (sectionIndex * 360) / totalSections;
+            const textAngle = -sectionAngle; // Counter-rotate to keep text upright
+            return textAngle;
+        }
+        
         // Update roulette wheel with current players
         function updateRouletteWheel() {
             const wheel = document.getElementById('rouletteWheel');
@@ -526,19 +570,28 @@
                 section.style.transform = `rotate(${i * (360 / totalSections)}deg)`;
                 
                 // Assign player to section
-                section.textContent = players[i] || `Player ${i + 1}`;
-                section.style.backgroundColor = i % 2 === 0 ? '#dc3545' : '#000000';
+                const playerName = players[i] || `Player ${i + 1}`;
+                
+                // Create text element with rotation
+                const textElement = document.createElement('div');
+                textElement.className = 'section-text';
+                textElement.textContent = playerName;
                 
                 // Adjust font size based on name length
-                const nameLength = (players[i] || '').length;
+                const nameLength = playerName.length;
                 if (nameLength > 15) {
-                    section.style.fontSize = '0.7rem';
+                    textElement.style.fontSize = '0.7rem';
                 } else if (nameLength > 10) {
-                    section.style.fontSize = '0.8rem';
+                    textElement.style.fontSize = '0.8rem';
                 } else {
-                    section.style.fontSize = '1rem';
+                    textElement.style.fontSize = '1rem';
                 }
                 
+                // Calculate and apply text rotation
+                const textRotation = calculateTextRotation(i, totalSections);
+                textElement.style.transform = `translate(-50%, -50%) rotate(${textRotation}deg)`;
+                
+                section.appendChild(textElement);
                 wheel.appendChild(section);
                 wheelSections.push({
                     element: section,
