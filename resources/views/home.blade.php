@@ -24,6 +24,7 @@
             min-height: calc(100vh - 4rem);
             padding: 2rem 0;
             overflow-x: hidden;
+            overflow-y: hidden;
             position: relative;
         }
         
@@ -292,38 +293,175 @@
             cursor: not-allowed;
         }
         
-        .winner-announcement {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 2rem;
-            text-align: center;
-            margin: 2rem 0;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        /* Winner Popup Overlay */
+        .winner-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.5s ease;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .winner-popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .winner-announcement {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 30px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            border: 3px solid #fff;
+            position: relative;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.5) rotateY(180deg);
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
         }
         
         .winner-announcement.show {
-            opacity: 1;
-            transform: scale(1);
+            transform: scale(1) rotateY(0deg);
+        }
+        
+        .winner-announcement::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
         
         .winner-name {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: bold;
-            color: #dc3545;
+            color: #fff;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounceIn 0.8s ease-out 0.3s both;
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
         
         .winner-number {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1.5rem;
+            animation: slideInUp 0.6s ease-out 0.5s both;
         }
+        
+        @keyframes slideInUp {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .congratulations-text {
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out 0.7s both;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .popup-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .popup-close-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        
+        .celebration-icons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .celebration-icon {
+            position: absolute;
+            font-size: 2rem;
+            color: #ffd700;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+        
+        .celebration-icon:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .celebration-icon:nth-child(2) { top: 20%; right: 15%; animation-delay: 0.5s; }
+        .celebration-icon:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 1s; }
+        .celebration-icon:nth-child(4) { bottom: 10%; right: 10%; animation-delay: 1.5s; }
+        .celebration-icon:nth-child(5) { top: 50%; left: 5%; animation-delay: 2s; }
+        .celebration-icon:nth-child(6) { top: 50%; right: 5%; animation-delay: 2.5s; }
         
         .confetti {
             position: fixed;
@@ -476,6 +614,23 @@
                 max-width: 100%;
                 padding: 0 1rem;
             }
+            
+            .winner-announcement {
+                padding: 2rem;
+                max-width: 90%;
+            }
+            
+            .winner-name {
+                font-size: 2rem;
+            }
+            
+            .winner-number {
+                font-size: 1.1rem;
+            }
+            
+            .congratulations-text {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -535,20 +690,28 @@
                     <i class="fas fa-play"></i> Spin the Wheel
                 </button>
                 
-                <div class="winner-announcement" id="winnerAnnouncement">
-                    <div class="winner-name" id="winnerName"></div>
-                    <div class="winner-number" id="winnerNumber"></div>
-                    <p class="mb-0">🎉 Congratulations! 🎉</p>
+                <!-- Winner Popup Overlay -->
+                <div class="winner-popup-overlay" id="winnerPopupOverlay">
+                    <div class="winner-announcement" id="winnerAnnouncement">
+                        <button class="popup-close-btn" onclick="closeWinnerPopup()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        
+                        <div class="celebration-icons">
+                            <div class="celebration-icon">🎉</div>
+                            <div class="celebration-icon">🏆</div>
+                            <div class="celebration-icon">⭐</div>
+                            <div class="celebration-icon">🎊</div>
+                            <div class="celebration-icon">🎈</div>
+                            <div class="celebration-icon">🎁</div>
+                        </div>
+                        
+                        <div class="winner-name" id="winnerName"></div>
+                        <div class="winner-number" id="winnerNumber"></div>
+                        <div class="congratulations-text">🎉 Congratulations! 🎉</div>
+                    </div>
                 </div>
                 
-                <div class="action-buttons" id="actionButtons" style="display: none;">
-                    <button class="btn btn-secondary" onclick="resetGame()">
-                        <i class="fas fa-refresh"></i> New Game
-                    </button>
-                    <a href="{{ route('winners') }}" class="btn btn-secondary">
-                        <i class="fas fa-trophy"></i> Past Winners
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -644,7 +807,7 @@
             players = [];
             updateRouletteWheel();
             hideGameControls();
-            document.getElementById('winnerAnnouncement').classList.remove('show');
+            closeWinnerPopup();
             document.getElementById('playersTextarea').value = '';
         }
         
@@ -839,15 +1002,35 @@
         function showWinner(winner, winningNumber) {
             const winnerName = document.getElementById('winnerName');
             const winnerNumber = document.getElementById('winnerNumber');
+            const winnerPopupOverlay = document.getElementById('winnerPopupOverlay');
             const winnerAnnouncement = document.getElementById('winnerAnnouncement');
             
             winnerName.textContent = winner;
             winnerNumber.textContent = `Winning Number: ${winningNumber}`;
             
-            winnerAnnouncement.classList.add('show');
+            // Show popup overlay first
+            winnerPopupOverlay.classList.add('show');
+            
+            // Add animation to the announcement after a short delay
+            setTimeout(() => {
+                winnerAnnouncement.classList.add('show');
+            }, 100);
             
             // Reset button
             resetButton();
+        }
+        
+        function closeWinnerPopup() {
+            const winnerPopupOverlay = document.getElementById('winnerPopupOverlay');
+            const winnerAnnouncement = document.getElementById('winnerAnnouncement');
+            
+            // Remove show class from announcement first
+            winnerAnnouncement.classList.remove('show');
+            
+            // Hide overlay after animation completes
+            setTimeout(() => {
+                winnerPopupOverlay.classList.remove('show');
+            }, 300);
         }
         
         function resetButton() {
