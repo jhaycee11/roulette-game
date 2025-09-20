@@ -200,9 +200,12 @@
                     </h1>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="{{ route('admin.logout') }}" class="btn logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
+                    <form method="POST" action="{{ route('admin.logout') }}" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

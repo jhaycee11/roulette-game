@@ -17,9 +17,9 @@ Route::get('/winners', [WinnerController::class, 'index'])->name('winners');
 // Admin section
 Route::get('/admin', [AdminController::class, 'index'])->name('admin');
 Route::post('/admin/login', [AdminController::class, 'login'])->name('admin.login');
+Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
 // Protected admin routes
 Route::middleware(['admin'])->group(function () {
-    Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
     Route::delete('/admin/winners/clear', [AdminController::class, 'clearWinners'])->name('admin.clear.winners');
 });
