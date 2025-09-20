@@ -136,7 +136,7 @@
             padding: 1rem;
             transition: border-color 0.3s ease;
             font-size: 0.95rem;
-            line-height: 3;
+            line-height: 1.5;
         }
         
         .player-input-area textarea:focus {
@@ -501,7 +501,7 @@
                     id="playersTextarea" 
                     rows="10" 
                     placeholder="Enter player names"
-                    style="resize: vertical; min-height: 200px;"
+                    style="resize: vertical; min-height: 500px;"
                 ></textarea>
             </div>
         </div>
