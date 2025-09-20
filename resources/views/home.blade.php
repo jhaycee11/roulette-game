@@ -217,6 +217,16 @@
             outline: none;
         }
         
+        .time-input.invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .time-input.invalid:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
         .time-unit {
             color: #6c757d;
             font-size: 0.8rem;
@@ -897,8 +907,11 @@
             <div class="setting-item">
                 <label class="setting-label">Wheel Spinning Time</label>
                 <div class="time-input-group">
-                    <input type="number" class="time-input" id="spinningTimeInput" min="1" max="60" value="4">
+                    <input type="number" class="time-input" id="spinningTimeInput" min="1" max="60" step="1" value="4" required>
                     <span class="time-unit">seconds</span>
+                </div>
+                <div class="validation-error" id="timeValidationError" style="display: none; color: #dc3545; font-size: 0.8rem; margin-top: 0.25rem;">
+                    Please enter a value between 1 and 60 seconds
                 </div>
                 <input type="range" class="time-slider" id="spinningTimeSlider" min="1" max="60" value="4">
                 <div class="time-display" id="timeDisplay">4 seconds</div>
@@ -1040,8 +1053,30 @@
             settingsPanel.classList.remove('show');
         }
         
+        // Validate spinning time input
+        function validateSpinningTime(time) {
+            const isValid = time >= 1 && time <= 60 && !isNaN(time);
+            const input = document.getElementById('spinningTimeInput');
+            const errorDiv = document.getElementById('timeValidationError');
+            
+            if (isValid) {
+                input.classList.remove('invalid');
+                errorDiv.style.display = 'none';
+                return true;
+            } else {
+                input.classList.add('invalid');
+                errorDiv.style.display = 'block';
+                return false;
+            }
+        }
+        
         // Update spinning time
         function updateSpinningTime(time) {
+            // Validate the input first
+            if (!validateSpinningTime(time)) {
+                return false;
+            }
+            
             spinningTime = Math.max(1, Math.min(60, time)); // Clamp between 1-60 seconds
             localStorage.setItem('rouletteSpinningTime', spinningTime);
             
@@ -1049,6 +1084,7 @@
             document.getElementById('spinningTimeInput').value = spinningTime;
             document.getElementById('spinningTimeSlider').value = spinningTime;
             document.getElementById('timeDisplay').textContent = `${spinningTime} second${spinningTime !== 1 ? 's' : ''}`;
+            return true;
         }
         
         // Load settings from localStorage
@@ -1262,6 +1298,13 @@
         function spinWheel() {
             if (isSpinning || players.length === 0) return;
             
+            // Validate spinning time before spinning
+            const currentTime = parseInt(document.getElementById('spinningTimeInput').value);
+            if (!validateSpinningTime(currentTime)) {
+                alert('Please enter a valid spinning time between 1 and 60 seconds.');
+                return;
+            }
+            
             isSpinning = true;
             const wheelCenter = document.getElementById('wheelCenter');
             const centerIcon = document.getElementById('centerIcon');
@@ -1445,8 +1488,16 @@
             
             spinningTimeInput.addEventListener('input', function() {
                 const time = parseInt(this.value);
-                if (time >= 1 && time <= 60) {
-                    updateSpinningTime(time);
+                updateSpinningTime(time);
+            });
+            
+            // Add validation on blur (when user leaves the field)
+            spinningTimeInput.addEventListener('blur', function() {
+                const time = parseInt(this.value);
+                if (isNaN(time) || time < 1 || time > 60) {
+                    // Reset to valid value if invalid
+                    this.value = spinningTime;
+                    validateSpinningTime(spinningTime);
                 }
             });
             
