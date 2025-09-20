@@ -5,13 +5,29 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
 
 class GameController extends Controller
 {
+    private function loadNextToWinFromFile()
+    {
+        $filePath = public_path('storage/save/nexttowin.json');
+        
+        if (!File::exists($filePath)) {
+            return [];
+        }
+        
+        try {
+            $content = File::get($filePath);
+            $data = json_decode($content, true);
+            return is_array($data) ? $data : [];
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
     public function index()
     {
-        $players = Session::get('players');
-        return view('home', compact('players'));
+        return view('home');
     }
 
     public function storePlayers(Request $request)
@@ -46,8 +62,7 @@ class GameController extends Controller
         $players = array_slice($allPlayers, 0, 1000);
         
         // No validation needed - accept all entries as-is
-
-        Session::put('players', $players);
+        // No session storage - players are handled in frontend only
         
         return redirect()->route('home');
     }
@@ -55,27 +70,54 @@ class GameController extends Controller
 
     public function spin(Request $request)
     {
-        $players = Session::get('players');
+        // Get players from request (sent from frontend)
+        $players = $request->input('players', []);
         
-        if (!$players) {
+        if (!$players || empty($players)) {
             return response()->json(['error' => 'No players found'], 400);
         }
 
-        // Create wheel sections based on number of players
-        $totalSections = count($players);
-        $wheelSections = $players;
+        // Check if there's a "Next to Win" list and if it should be used
+        $nextToWin = $this->loadNextToWinFromFile();
+        $nextToWinUsed = false;
+        $targetWinner = null;
         
-        // Shuffle the assignments to make it more random
+        // 30% chance to use someone from "Next to Win" list if available
+        if (!empty($nextToWin) && rand(1, 100) <= 30) {
+            // Only use "Next to Win" if the selected person is actually in the current players list
+            $availableNextToWin = [];
+            foreach ($nextToWin as $nextToWinEntry) {
+                if (in_array($nextToWinEntry['name'], $players)) {
+                    $availableNextToWin[] = $nextToWinEntry['name'];
+                }
+            }
+            
+            if (!empty($availableNextToWin)) {
+                $nextToWinUsed = true;
+                $targetWinner = $availableNextToWin[rand(0, count($availableNextToWin) - 1)];
+            }
+        }
+        
+        // Create wheel sections (shuffle for visual randomness)
+        $wheelSections = $players;
         shuffle($wheelSections);
         
-        // Select winning section
-        $winningSection = rand(0, $totalSections - 1);
-        $winner = $wheelSections[$winningSection];
+        // Determine the winning section and winner
+        if ($nextToWinUsed && $targetWinner) {
+            // Find the target winner's position in the shuffled wheel
+            $winningSection = array_search($targetWinner, $wheelSections);
+            $winner = $targetWinner;
+        } else {
+            // Random selection from current players
+            $winningSection = rand(0, count($players) - 1);
+            $winner = $wheelSections[$winningSection];
+        }
         
         return response()->json([
             'winner' => $winner,
             'winning_number' => $winningSection,
-            'wheel_sections' => $wheelSections
+            'wheel_sections' => $wheelSections,
+            'next_to_win_used' => $nextToWinUsed
         ]);
     }
 }

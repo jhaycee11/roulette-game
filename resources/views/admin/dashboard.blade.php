@@ -184,6 +184,7 @@
             box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
         }
         
+        
         @media (max-width: 768px) {
             .admin-title {
                 font-size: 1.5rem;
@@ -366,6 +367,7 @@
                 });
             }
         }
+        
     </script>
 </body>
 </html>

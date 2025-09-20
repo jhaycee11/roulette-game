@@ -20,3 +20,6 @@ Route::middleware(['admin'])->group(function () {
     Route::post('/admin/add-win', [AdminController::class, 'addWin'])->name('admin.add.win');
     Route::delete('/admin/next-to-win/clear', [AdminController::class, 'clearNextToWin'])->name('admin.clear.next.to.win');
 });
+
+// Debug route (accessible from home page)
+Route::post('/debug/next-to-win', [AdminController::class, 'debugNextToWin'])->name('admin.debug.next.to.win');

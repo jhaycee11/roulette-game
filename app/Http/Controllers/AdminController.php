@@ -5,9 +5,50 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
 
 class AdminController extends Controller
 {
+    private function getJsonFilePath()
+    {
+        return public_path('storage/save/nexttowin.json');
+    }
+    
+    private function loadNextToWinFromFile()
+    {
+        $filePath = $this->getJsonFilePath();
+        
+        if (!File::exists($filePath)) {
+            return [];
+        }
+        
+        try {
+            $content = File::get($filePath);
+            $data = json_decode($content, true);
+            return is_array($data) ? $data : [];
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+    
+    private function saveNextToWinToFile($nextToWin)
+    {
+        $filePath = $this->getJsonFilePath();
+        
+        // Ensure directory exists
+        $directory = dirname($filePath);
+        if (!File::exists($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+        
+        try {
+            $jsonData = json_encode($nextToWin, JSON_PRETTY_PRINT);
+            File::put($filePath, $jsonData);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
     public function index()
     {
         // Simple admin authentication check
@@ -22,7 +63,7 @@ class AdminController extends Controller
             'recent_winners' => collect([])
         ];
         
-        $nextToWin = session('next_to_win', []);
+        $nextToWin = $this->loadNextToWinFromFile();
         
         return view('admin.dashboard', compact('stats', 'nextToWin'));
     }
@@ -65,8 +106,8 @@ class AdminController extends Controller
             'winner_name' => 'required|string|max:255'
         ]);
         
-        // Get existing next to win list from session
-        $nextToWin = session('next_to_win', []);
+        // Get existing next to win list from JSON file
+        $nextToWin = $this->loadNextToWinFromFile();
         
         // Add the new name to the list
         $nextToWin[] = [
@@ -75,8 +116,8 @@ class AdminController extends Controller
             'added_by' => session('admin_user', 'Admin')
         ];
         
-        // Store back to session
-        session(['next_to_win' => $nextToWin]);
+        // Save to JSON file
+        $this->saveNextToWinToFile($nextToWin);
         
         return redirect()->route('admin')->with('success', 'Name added to Next to Win list!');
     }
@@ -87,9 +128,50 @@ class AdminController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         
-        session()->forget('next_to_win');
+        // Clear the JSON file
+        $this->saveNextToWinToFile([]);
         
         return response()->json(['message' => 'Next to Win list cleared successfully']);
+    }
+    
+    public function debugNextToWin(Request $request)
+    {
+        $nextToWin = $this->loadNextToWinFromFile();
+        $players = $request->input('players', []);
+        
+        // Check which Next to Win names are in the current player list
+        $comparison = [];
+        $availableInPlayers = [];
+        $notInPlayers = [];
+        
+        foreach ($nextToWin as $index => $item) {
+            $isInPlayers = in_array($item['name'], $players);
+            $comparison[] = [
+                'name' => $item['name'],
+                'added_by' => $item['added_by'],
+                'added_at' => $item['added_at'],
+                'is_in_players' => $isInPlayers,
+                'index' => $index + 1
+            ];
+            
+            if ($isInPlayers) {
+                $availableInPlayers[] = $item['name'];
+            } else {
+                $notInPlayers[] = $item['name'];
+            }
+        }
+        
+        return response()->json([
+            'nextToWin' => $nextToWin,
+            'players' => $players,
+            'count' => count($nextToWin),
+            'playerCount' => count($players),
+            'comparison' => $comparison,
+            'availableInPlayers' => $availableInPlayers,
+            'notInPlayers' => $notInPlayers,
+            'availableCount' => count($availableInPlayers),
+            'notAvailableCount' => count($notInPlayers)
+        ]);
     }
     
 }

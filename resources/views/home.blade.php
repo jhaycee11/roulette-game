@@ -124,6 +124,28 @@
             transform: scale(1.1);
         }
         
+        .debug-btn {
+            position: fixed;
+            top: 20px;
+            left: 80px;
+            background: #17a2b8;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        
+        .debug-btn:hover {
+            background: #138496;
+            transform: scale(1.1);
+        }
+        
         .settings-panel {
             position: fixed;
             top: 70px;
@@ -816,6 +838,14 @@
                 font-size: 1rem;
             }
             
+            .debug-btn {
+                top: 15px;
+                left: 65px;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
             .settings-panel {
                 top: 60px;
                 left: 15px;
@@ -893,6 +923,11 @@
         <!-- Settings Button -->
         <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()">
             <i class="fas fa-cog"></i>
+        </button>
+        
+        <!-- Debug Button -->
+        <button class="debug-btn" id="debugBtn" onclick="showDebugInfo()">
+            <i class="fas fa-bug"></i>
         </button>
         
         <!-- Settings Panel -->
@@ -1078,7 +1113,7 @@
             }
             
             spinningTime = Math.max(1, Math.min(60, time)); // Clamp between 1-60 seconds
-            localStorage.setItem('rouletteSpinningTime', spinningTime);
+            // No localStorage - settings are not persisted
             
             // Update input and slider
             document.getElementById('spinningTimeInput').value = spinningTime;
@@ -1087,13 +1122,11 @@
             return true;
         }
         
-        // Load settings from localStorage
+        // Load settings (no persistence)
         function loadSettings() {
-            const savedTime = localStorage.getItem('rouletteSpinningTime');
-            if (savedTime) {
-                spinningTime = parseInt(savedTime);
-                updateSpinningTime(spinningTime);
-            }
+            // Settings are not persisted - use default values
+            spinningTime = 4; // Default spinning time
+            updateSpinningTime(spinningTime);
         }
         
         // Debounce timer for auto-updating
@@ -1466,6 +1499,74 @@
                     }, 5000);
                 }, i * 50);
             }
+        }
+        
+        function showDebugInfo() {
+            // Get the Next to Win data from session
+            fetch('{{ route("admin.debug.next.to.win") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    players: players
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let debugInfo = '=== DEBUG: Next to Win vs Player List ===\n\n';
+                
+                // Summary
+                debugInfo += `📊 SUMMARY:\n`;
+                debugInfo += `Next to Win entries: ${data.count}\n`;
+                debugInfo += `Current players: ${data.playerCount}\n`;
+                debugInfo += `Available in players: ${data.availableCount}\n`;
+                debugInfo += `NOT in players: ${data.notAvailableCount}\n\n`;
+                
+                if (data.nextToWin && data.nextToWin.length > 0) {
+                    debugInfo += `=== NEXT TO WIN LIST ===\n\n`;
+                    
+                    data.comparison.forEach((item) => {
+                        const status = item.is_in_players ? '✅ IN PLAYERS' : '❌ NOT IN PLAYERS';
+                        debugInfo += `${item.index}. "${item.name}" ${status}\n`;
+                        debugInfo += `   Added by: ${item.added_by}\n`;
+                        debugInfo += `   Added at: ${item.added_at}\n\n`;
+                    });
+                    
+                    if (data.availableInPlayers.length > 0) {
+                        debugInfo += `=== AVAILABLE IN PLAYERS ===\n`;
+                        debugInfo += data.availableInPlayers.join(', ') + '\n\n';
+                    }
+                    
+                    if (data.notInPlayers.length > 0) {
+                        debugInfo += `=== NOT IN PLAYERS ===\n`;
+                        debugInfo += data.notInPlayers.join(', ') + '\n\n';
+                    }
+                } else {
+                    debugInfo += 'No entries in Next to Win list.\n\n';
+                }
+                
+                if (data.players && data.players.length > 0) {
+                    debugInfo += `=== CURRENT PLAYER LIST ===\n`;
+                    debugInfo += data.players.join(', ') + '\n\n';
+                } else {
+                    debugInfo += 'No players in current game.\n\n';
+                }
+                
+                debugInfo += '=== Raw JSON Data ===\n';
+                debugInfo += JSON.stringify(data, null, 2);
+                
+                // Show in a modal-like alert
+                alert(debugInfo);
+                
+                // Also log to console for developers
+                console.log('=== DEBUG: Next to Win vs Players ===', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error fetching debug information: ' + error.message);
+            });
         }
         
         // Initialize when page loads
