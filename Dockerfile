@@ -1,4 +1,4 @@
-# Use official PHP image with CLI and extensions
+# Base image
 FROM php:8.2-cli
 
 # Set working directory
@@ -19,12 +19,12 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions for Laravel
+# Set Laravel storage and bootstrap permissions
 RUN mkdir -p storage/framework/{cache,views,sessions} bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Expose port for Laravel
+# Expose port
 EXPOSE 8000
 
-# Start Laravel
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Start Laravel using the port Render provides
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT}"]
