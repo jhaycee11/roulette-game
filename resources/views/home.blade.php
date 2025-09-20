@@ -102,6 +102,177 @@
             visibility: visible;
         }
         
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #6c757d;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        
+        .settings-btn:hover {
+            background: #5a6268;
+            transform: scale(1.1);
+        }
+        
+        .settings-panel {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-20px);
+        }
+        
+        .settings-panel.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .settings-header h4 {
+            color: #333;
+            margin: 0;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .settings-close-btn {
+            background: #dc3545;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .settings-close-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+        
+        .setting-item {
+            margin-bottom: 1rem;
+        }
+        
+        .setting-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .time-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .time-input {
+            flex: 1;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .time-input:focus {
+            border-color: #6c757d;
+            box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+            outline: none;
+        }
+        
+        .time-unit {
+            color: #6c757d;
+            font-size: 0.8rem;
+            font-weight: 500;
+            min-width: 30px;
+        }
+        
+        .time-slider {
+            width: 100%;
+            margin-top: 0.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #e9ecef;
+            outline: none;
+        }
+        
+        .time-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .time-slider::-webkit-slider-thumb:hover {
+            background: #5a6268;
+            transform: scale(1.1);
+        }
+        
+        .time-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6c757d;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .time-slider::-moz-range-thumb:hover {
+            background: #5a6268;
+            transform: scale(1.1);
+        }
+        
+        .time-display {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
         .toggle-btn:hover {
             background: #c82333;
             transform: scale(1.1);
@@ -178,7 +349,7 @@
         }
         
         .roulette-wheel.spinning {
-            animation: spin 4s cubic-bezier(0.23, 1, 0.320, 1);
+            animation: spin var(--spin-duration, 4s) cubic-bezier(0.23, 1, 0.320, 1);
         }
         
         @keyframes spin {
@@ -627,6 +798,22 @@
                 align-items: center;
             }
             
+            .settings-btn {
+                top: 15px;
+                left: 15px;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .settings-panel {
+                top: 60px;
+                left: 15px;
+                right: 15px;
+                width: auto;
+                max-width: calc(100vw - 30px);
+            }
+            
             .player-section {
                 position: fixed;
                 top: 1rem;
@@ -693,6 +880,31 @@
 </head>
 <body>
     <div class="main-container">
+        <!-- Settings Button -->
+        <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()">
+            <i class="fas fa-cog"></i>
+        </button>
+        
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h4><i class="fas fa-cog"></i> Settings</h4>
+                <button class="settings-close-btn" onclick="closeSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Wheel Spinning Time</label>
+                <div class="time-input-group">
+                    <input type="number" class="time-input" id="spinningTimeInput" min="1" max="60" value="4">
+                    <span class="time-unit">seconds</span>
+                </div>
+                <input type="range" class="time-slider" id="spinningTimeSlider" min="1" max="60" value="4">
+                <div class="time-display" id="timeDisplay">4 seconds</div>
+            </div>
+        </div>
+        
         <!-- Show Toggle Button (appears when list is hidden) -->
         <button class="show-toggle-btn" id="showToggleBtn" onclick="showPlayerList()">
             <i class="fas fa-chevron-left"></i>
@@ -780,6 +992,8 @@
         let wheelSections = [];
         let playerListVisible = true; // Default to visible
         let players = [];
+        let settingsVisible = false;
+        let spinningTime = 4; // Default spinning time in seconds
         
         // Hide player list
         function hidePlayerList() {
@@ -799,6 +1013,51 @@
             playerListVisible = true;
             playerSection.classList.remove('collapsed');
             showToggleBtn.classList.remove('visible');
+        }
+        
+        // Toggle settings panel
+        function toggleSettings() {
+            const settingsPanel = document.getElementById('settingsPanel');
+            
+            if (settingsVisible) {
+                closeSettings();
+            } else {
+                openSettings();
+            }
+        }
+        
+        // Open settings panel
+        function openSettings() {
+            const settingsPanel = document.getElementById('settingsPanel');
+            settingsVisible = true;
+            settingsPanel.classList.add('show');
+        }
+        
+        // Close settings panel
+        function closeSettings() {
+            const settingsPanel = document.getElementById('settingsPanel');
+            settingsVisible = false;
+            settingsPanel.classList.remove('show');
+        }
+        
+        // Update spinning time
+        function updateSpinningTime(time) {
+            spinningTime = Math.max(1, Math.min(60, time)); // Clamp between 1-60 seconds
+            localStorage.setItem('rouletteSpinningTime', spinningTime);
+            
+            // Update input and slider
+            document.getElementById('spinningTimeInput').value = spinningTime;
+            document.getElementById('spinningTimeSlider').value = spinningTime;
+            document.getElementById('timeDisplay').textContent = `${spinningTime} second${spinningTime !== 1 ? 's' : ''}`;
+        }
+        
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedTime = localStorage.getItem('rouletteSpinningTime');
+            if (savedTime) {
+                spinningTime = parseInt(savedTime);
+                updateSpinningTime(spinningTime);
+            }
         }
         
         // Debounce timer for auto-updating
@@ -1025,16 +1284,17 @@
             // Calculate final rotation (just extra spins, winner determined by final position)
             const finalRotation = extraRotation;
             
-            // Set CSS variable for final rotation
+            // Set CSS variables for animation
             wheel.style.setProperty('--spin-rotation', `${finalRotation}deg`);
+            wheel.style.setProperty('--spin-duration', `${spinningTime}s`);
             
-            // Show winner after animation completes
+            // Show winner after animation completes (use custom spinning time)
             setTimeout(() => {
                 // Calculate winner based on final wheel position
                 const actualWinner = calculateWinnerFromPosition(finalRotation);
                 showWinner(actualWinner.winner, actualWinner.winnerNumber);
                 createConfetti();
-            }, 4000);
+            }, spinningTime * 1000);
         }
         
         // Calculate winner based on final wheel position
@@ -1175,6 +1435,33 @@
                 setTimeout(autoUpdatePlayers, 10);
             });
             
+            // Settings event listeners
+            const spinningTimeInput = document.getElementById('spinningTimeInput');
+            const spinningTimeSlider = document.getElementById('spinningTimeSlider');
+            
+            spinningTimeInput.addEventListener('input', function() {
+                const time = parseInt(this.value);
+                if (time >= 1 && time <= 60) {
+                    updateSpinningTime(time);
+                }
+            });
+            
+            spinningTimeSlider.addEventListener('input', function() {
+                updateSpinningTime(parseInt(this.value));
+            });
+            
+            // Close settings when clicking outside
+            document.addEventListener('click', function(event) {
+                const settingsPanel = document.getElementById('settingsPanel');
+                const settingsBtn = document.getElementById('settingsBtn');
+                
+                if (settingsVisible && 
+                    !settingsPanel.contains(event.target) && 
+                    !settingsBtn.contains(event.target)) {
+                    closeSettings();
+                }
+            });
+            
             // Initialize player list as visible by default
             const playerSection = document.getElementById('playerSection');
             const showToggleBtn = document.getElementById('showToggleBtn');
@@ -1183,6 +1470,9 @@
             playerListVisible = true;
             playerSection.classList.remove('collapsed');
             showToggleBtn.classList.remove('visible');
+            
+            // Load saved settings
+            loadSettings();
             
             // Auto-focus the textarea
             playersTextarea.focus();
