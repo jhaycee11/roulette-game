@@ -370,14 +370,9 @@
                     class="form-control" 
                     id="playersTextarea" 
                     rows="10" 
-                    placeholder="Enter player names, one per line...&#10;&#10;Example:&#10;John Doe&#10;Jane Smith&#10;Mike Johnson"
+                    placeholder="Enter player names, one per line...&#10;&#10;Example:&#10;John Doe&#10;Jane Smith&#10;Mike Johnson&#10;&#10;The roulette will update automatically as you type!"
                     style="resize: vertical; min-height: 200px;"
                 ></textarea>
-                <div class="mt-3 text-center">
-                    <button class="btn btn-primary" id="loadPlayersBtn">
-                        <i class="fas fa-play"></i> Load Players
-                    </button>
-                </div>
             </div>
         </div>
         
@@ -445,52 +440,70 @@
             }
         }
         
-        // Load players from textarea
-        function loadPlayers() {
+        // Debounce timer for auto-updating
+        let updateTimeout;
+        
+        // Auto-update players from textarea
+        function autoUpdatePlayers() {
             const textarea = document.getElementById('playersTextarea');
             const playerNames = textarea.value.trim();
             
-            if (!playerNames) {
-                alert('Please enter at least one player name.');
-                return;
-            }
+            // Clear existing timeout
+            clearTimeout(updateTimeout);
             
-            // Parse player names from textarea (split by newlines and filter empty lines)
-            const newPlayers = playerNames.split('\n')
-                .map(name => name.trim())
-                .filter(name => name.length > 0);
-            
-            if (newPlayers.length < 2) {
-                alert('Please enter at least 2 player names.');
-                return;
-            }
-            
-            // Remove duplicates while preserving order
-            players = [...new Set(newPlayers)];
-            
-            // Update roulette wheel
-            updateRouletteWheel();
-            
-            // Show game controls
+            // Set new timeout for debounced update
+            updateTimeout = setTimeout(() => {
+                if (!playerNames) {
+                    // Clear players if textarea is empty
+                    players = [];
+                    updateRouletteWheel();
+                    hideGameControls();
+                    return;
+                }
+                
+                // Parse player names from textarea (split by newlines and filter empty lines)
+                const newPlayers = playerNames.split('\n')
+                    .map(name => name.trim())
+                    .filter(name => name.length > 0);
+                
+                if (newPlayers.length < 2) {
+                    // Don't show game controls if less than 2 players
+                    players = newPlayers;
+                    updateRouletteWheel();
+                    hideGameControls();
+                    return;
+                }
+                
+                // Remove duplicates while preserving order
+                players = [...new Set(newPlayers)];
+                
+                // Update roulette wheel and show game controls
+                updateRouletteWheel();
+                showGameControls();
+            }, 500); // 500ms delay to avoid too frequent updates
+        }
+        
+        // Show game controls
+        function showGameControls() {
             document.getElementById('wheelContainer').style.display = 'block';
             document.getElementById('spinButton').style.display = 'inline-block';
             document.getElementById('actionButtons').style.display = 'flex';
-            
-            // Clear the textarea
-            textarea.value = '';
-            
-            // Show success message
-            alert(`Loaded ${players.length} players successfully!`);
+        }
+        
+        // Hide game controls
+        function hideGameControls() {
+            document.getElementById('wheelContainer').style.display = 'none';
+            document.getElementById('spinButton').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'none';
         }
         
         // Reset game
         function resetGame() {
             players = [];
             updateRouletteWheel();
-            document.getElementById('wheelContainer').style.display = 'none';
-            document.getElementById('spinButton').style.display = 'none';
-            document.getElementById('actionButtons').style.display = 'none';
+            hideGameControls();
             document.getElementById('winnerAnnouncement').classList.remove('show');
+            document.getElementById('playersTextarea').value = '';
         }
         
         // Update roulette wheel with current players
@@ -621,17 +634,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Set up event listeners
             const playersTextarea = document.getElementById('playersTextarea');
-            const loadPlayersBtn = document.getElementById('loadPlayersBtn');
             
-            // Load players on button click
-            loadPlayersBtn.addEventListener('click', loadPlayers);
+            // Auto-update players as user types
+            playersTextarea.addEventListener('input', autoUpdatePlayers);
             
-            // Load players on Ctrl+Enter in textarea
-            playersTextarea.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    loadPlayers();
-                }
+            // Auto-update players on paste
+            playersTextarea.addEventListener('paste', function() {
+                // Wait for paste to complete, then update
+                setTimeout(autoUpdatePlayers, 10);
             });
             
             // Auto-focus the textarea
