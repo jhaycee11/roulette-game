@@ -19,6 +19,7 @@
             display: flex;
             min-height: 100vh;
             padding: 2rem 0;
+            overflow-x: hidden;
         }
         
         .game-section {
@@ -29,6 +30,7 @@
             align-items: center;
             padding: 0 2rem;
             position: relative;
+            order: 1;
         }
         
         .player-section {
@@ -39,21 +41,40 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
-            margin-right: 2rem;
+            margin-left: 2rem;
             transition: transform 0.3s ease;
             max-height: 80vh;
             overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            order: 2;
         }
         
         .player-section.collapsed {
-            transform: translateX(250px);
+            transform: translateX(100%);
+            opacity: 0;
+            pointer-events: none;
         }
         
         .toggle-btn {
-            position: absolute;
-            top: 20px;
-            right: -40px;
             background: #dc3545;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+        
+        .show-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
             border: none;
             border-radius: 50%;
             width: 40px;
@@ -62,11 +83,24 @@
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .show-toggle-btn.visible {
+            opacity: 1;
+            visibility: visible;
         }
         
         .toggle-btn:hover {
             background: #c82333;
+            transform: scale(1.1);
+        }
+        
+        .show-toggle-btn:hover {
+            background: #218838;
             transform: scale(1.1);
         }
         
@@ -388,12 +422,24 @@
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
+                overflow-x: hidden;
             }
             
             .player-section {
                 width: 100%;
                 margin-right: 0;
                 margin-bottom: 2rem;
+            }
+            
+            .player-section.collapsed {
+                transform: translateY(-100%);
+                opacity: 0;
+                pointer-events: none;
+            }
+            
+            .toggle-btn {
+                top: 15px;
+                right: 15px;
             }
             
             .wheel-container {
@@ -419,13 +465,17 @@
 </head>
 <body>
     <div class="main-container">
+        <!-- Show Toggle Button (appears when list is hidden) -->
+        <button class="show-toggle-btn" id="showToggleBtn" onclick="showPlayerList()">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        
         <!-- Player Input Section -->
         <div class="player-section" id="playerSection">
-            <button class="toggle-btn" onclick="togglePlayerList()">
-                <i class="fas fa-chevron-right" id="toggleIcon"></i>
-            </button>
-            
             <div class="player-section-header">
+                <button class="toggle-btn" onclick="hidePlayerList()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
                 <h3><i class="fas fa-users"></i> Players</h3>
             </div>
             
@@ -492,23 +542,27 @@
     <script>
         let isSpinning = false;
         let wheelSections = [];
-        let playerListVisible = true;
+        let playerListVisible = true; // Default to visible
         let players = [];
         
-        // Toggle player list visibility
-        function togglePlayerList() {
+        // Hide player list
+        function hidePlayerList() {
             const playerSection = document.getElementById('playerSection');
-            const toggleIcon = document.getElementById('toggleIcon');
+            const showToggleBtn = document.getElementById('showToggleBtn');
             
-            playerListVisible = !playerListVisible;
+            playerListVisible = false;
+            playerSection.classList.add('collapsed');
+            showToggleBtn.classList.add('visible');
+        }
+        
+        // Show player list
+        function showPlayerList() {
+            const playerSection = document.getElementById('playerSection');
+            const showToggleBtn = document.getElementById('showToggleBtn');
             
-            if (playerListVisible) {
-                playerSection.classList.remove('collapsed');
-                toggleIcon.className = 'fas fa-chevron-right';
-            } else {
-                playerSection.classList.add('collapsed');
-                toggleIcon.className = 'fas fa-chevron-left';
-            }
+            playerListVisible = true;
+            playerSection.classList.remove('collapsed');
+            showToggleBtn.classList.remove('visible');
         }
         
         // Debounce timer for auto-updating
@@ -832,6 +886,15 @@
                 // Wait for paste to complete, then update
                 setTimeout(autoUpdatePlayers, 10);
             });
+            
+            // Initialize player list as visible by default
+            const playerSection = document.getElementById('playerSection');
+            const showToggleBtn = document.getElementById('showToggleBtn');
+            
+            // Ensure player list starts visible
+            playerListVisible = true;
+            playerSection.classList.remove('collapsed');
+            showToggleBtn.classList.remove('visible');
             
             // Auto-focus the textarea
             playersTextarea.focus();
