@@ -112,11 +112,11 @@
         
         .wheel-container {
             position: relative;
-            width: 400px;
-            height: 400px;
+            width: 500px;
+            height: 500px;
             margin: 2rem auto;
-            min-width: 300px;
-            min-height: 300px;
+            min-width: 400px;
+            min-height: 400px;
         }
         
         .roulette-wheel {
@@ -369,8 +369,8 @@
             }
             
             .wheel-container {
-                width: 300px;
-                height: 300px;
+                width: 350px;
+                height: 350px;
             }
             
             .winner-name {
@@ -588,15 +588,15 @@
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('width', '100%');
             svg.setAttribute('height', '100%');
-            svg.setAttribute('viewBox', '0 0 400 400');
+            svg.setAttribute('viewBox', '0 0 500 500');
             svg.style.position = 'absolute';
             svg.style.top = '0';
             svg.style.left = '0';
             svg.style.zIndex = '5';
             
-            const centerX = 200;
-            const centerY = 200;
-            const radius = 190;
+            const centerX = 250;
+            const centerY = 250;
+            const radius = 240;
             const anglePerSection = 360 / totalSections;
             
             // Create sections based on number of players
@@ -626,25 +626,31 @@
                 
                 // Position text in the middle of the slice
                 const textAngle = startAngle + (anglePerSection / 2);
+                
+                // Use consistent radius for all text
                 const textRadius = radius * 0.6;
+                
                 const textX = centerX + textRadius * Math.cos((textAngle - 90) * Math.PI / 180);
                 const textY = centerY + textRadius * Math.sin((textAngle - 90) * Math.PI / 180);
+                
+                // Calculate rotation to align text with slice angle
+                // Add 90 degrees to account for text baseline, then rotate to match slice
+                const textRotation = textAngle + 90;
                 
                 textElement.style.position = 'absolute';
                 textElement.style.left = textX + 'px';
                 textElement.style.top = textY + 'px';
-                textElement.style.transform = 'translate(-50%, -50%)';
+                textElement.style.transform = `translate(-50%, -50%) rotate(${textRotation}deg)`;
                 textElement.style.zIndex = '10';
+                textElement.style.transformOrigin = 'center';
                 
-                // Adjust font size based on name length
-                const nameLength = (players[i] || '').length;
-                if (nameLength > 15) {
-                    textElement.style.fontSize = '0.7rem';
-                } else if (nameLength > 10) {
-                    textElement.style.fontSize = '0.8rem';
-                } else {
-                    textElement.style.fontSize = '1rem';
-                }
+                // Use consistent font size for all text
+                textElement.style.fontSize = '1rem';
+                
+                // Add text overflow handling
+                textElement.style.overflow = 'hidden';
+                textElement.style.textOverflow = 'ellipsis';
+                textElement.style.whiteSpace = 'nowrap';
                 
                 wheel.appendChild(textElement);
                 wheelSections.push({
