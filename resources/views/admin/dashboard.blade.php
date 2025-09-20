@@ -169,6 +169,35 @@
             box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
         
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
         @media (max-width: 768px) {
             .admin-title {
                 font-size: 1.5rem;
@@ -212,6 +241,13 @@
     </div>
     
     <div class="container">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+        
         <div class="row mb-4">
             <div class="col-md-3 mb-3">
                 <div class="stats-card text-center">
@@ -252,7 +288,7 @@
         </div>
         
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-6">
                 <div class="recent-winners-card">
                     <h4 class="mb-3">
                         <i class="fas fa-list"></i> Recent Winners
@@ -280,15 +316,69 @@
                 </div>
             </div>
             
-            <div class="col-lg-4">
+            <div class="col-lg-6">
+                <div class="recent-winners-card">
+                    <h4 class="mb-3">
+                        <i class="fas fa-star"></i> Next to Win
+                    </h4>
+                    
+                    @if(count($nextToWin) > 0)
+                        @foreach($nextToWin as $index => $item)
+                            <div class="winner-item">
+                                <div>
+                                    <div class="winner-name">{{ $item['name'] }}</div>
+                                    <div class="winner-date">
+                                        <i class="fas fa-plus-circle me-1"></i>
+                                        Added by {{ $item['added_by'] }} on {{ $item['added_at'] }}
+                                    </div>
+                                </div>
+                                <div class="winner-number">{{ $index + 1 }}</div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-star fa-3x mb-3"></i>
+                            <p>No names in Next to Win list</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-lg-12">
                 <div class="recent-winners-card">
                     <h4 class="mb-3">
                         <i class="fas fa-cog"></i> Admin Actions
                     </h4>
                     
+                    <!-- Add to Win List Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-plus-circle"></i> Add to Win List
+                        </h5>
+                        <form method="POST" action="{{ route('admin.add.win') }}" id="addWinForm">
+                            @csrf
+                            <div class="mb-3">
+                                <input type="text" 
+                                       class="form-control" 
+                                       name="winner_name" 
+                                       placeholder="Enter winner name" 
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus"></i> Add Next to Win
+                            </button>
+                        </form>
+                    </div>
+                    
                     <div class="d-grid gap-2">
                         <button class="btn clear-winners-btn" onclick="clearWinners()">
                             <i class="fas fa-trash"></i> Clear All Winners
+                        </button>
+                        
+                        <button class="btn btn-warning" onclick="clearNextToWin()">
+                            <i class="fas fa-star"></i> Clear Next to Win List
                         </button>
                         
                         <a href="{{ route('winners') }}" class="btn btn-secondary">
@@ -327,6 +417,31 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred while clearing winners.');
+                });
+            }
+        }
+        
+        function clearNextToWin() {
+            if (confirm('Are you sure you want to clear the Next to Win list? This action cannot be undone.')) {
+                fetch('{{ route("admin.clear.next.to.win") }}', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        alert(data.message);
+                        location.reload();
+                    } else if (data.error) {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while clearing the Next to Win list.');
                 });
             }
         }

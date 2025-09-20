@@ -22,4 +22,6 @@ Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.lo
 // Protected admin routes
 Route::middleware(['admin'])->group(function () {
     Route::delete('/admin/winners/clear', [AdminController::class, 'clearWinners'])->name('admin.clear.winners');
+    Route::post('/admin/add-win', [AdminController::class, 'addWin'])->name('admin.add.win');
+    Route::delete('/admin/next-to-win/clear', [AdminController::class, 'clearNextToWin'])->name('admin.clear.next.to.win');
 });
