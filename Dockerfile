@@ -1,32 +1,30 @@
-FROM php:8.2-fpm
+# Use official PHP image with CLI and extensions
+FROM php:8.2-cli
+
+# Set working directory
+WORKDIR /var/www/html
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     unzip git curl libpng-dev libonig-dev libxml2-dev zip libzip-dev \
-    nginx supervisor \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /app
+# Copy project files
 COPY . .
 
 # Install PHP dependencies
-RUN composer install --optimize-autoloader --no-dev
+RUN composer install --no-dev --optimize-autoloader
 
-# Cache configs
-RUN php artisan config:cache || true
-RUN php artisan route:cache || true
-RUN php artisan view:cache || true
+# Set permissions for Laravel
+RUN mkdir -p storage/framework/{cache,views,sessions} bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-# Nginx configuration
-COPY ./nginx.conf /etc/nginx/sites-enabled/default
+# Expose port for Laravel
+EXPOSE 8000
 
-# Supervisor config to run PHP-FPM and Nginx
-COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-EXPOSE 80
-
-CMD ["/usr/bin/supervisord", "-n"]
+# Start Laravel
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]

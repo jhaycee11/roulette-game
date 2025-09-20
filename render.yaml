@@ -3,3 +3,10 @@ services:
     name: laravel-app
     env: docker
     plan: free
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader
+      php artisan storage:link
+      mkdir -p storage/framework/{cache,views,sessions} bootstrap/cache
+      chmod -R 775 storage bootstrap/cache
+    startCommand: |
+      php artisan serve --host 0.0.0.0 --port $PORT
