@@ -1279,7 +1279,11 @@
             
             // Calculate random extra spins (3-8 full rotations)
             const extraSpins = Math.random() * 5 + 3;
-            const extraRotation = extraSpins * 360;
+            
+            // Adjust rotation amount based on spinning time to maintain consistent visual speed
+            // Base speed is for 4 seconds, so multiply by spinningTime/4 to maintain same visual speed
+            const speedMultiplier = spinningTime / 4;
+            const extraRotation = extraSpins * 360 * speedMultiplier;
             
             // Calculate final rotation (just extra spins, winner determined by final position)
             const finalRotation = extraRotation;
