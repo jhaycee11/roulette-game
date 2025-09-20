@@ -13,11 +13,13 @@
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
+            padding: 2rem;
+            box-sizing: border-box;
         }
         
         .main-container {
             display: flex;
-            min-height: 100vh;
+            min-height: calc(100vh - 4rem);
             padding: 2rem 0;
             overflow-x: hidden;
         }
@@ -420,9 +422,14 @@
         }
         
         @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
             .main-container {
                 flex-direction: column;
                 overflow-x: hidden;
+                min-height: calc(100vh - 2rem);
             }
             
             .player-section {
@@ -679,13 +686,6 @@
             if (totalSections === 0) {
                 wheel.innerHTML = `
                     <div class="wheel-center"><i class="fas fa-star"></i></div>
-                    <div class="empty-wheel-message" id="emptyWheelMessage">
-                        <div class="empty-message-text">
-                            <i class="fas fa-plus-circle"></i><br>
-                            Add players to start spinning!<br>
-                            <small>Enter names in the textarea</small>
-                        </div>
-                    </div>
                 `;
                 return;
             }
