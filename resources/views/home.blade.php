@@ -1228,7 +1228,44 @@
             };
         }
         
-        // Update roulette wheel with current players
+        // Calculate dynamic font size based on number of players
+        function calculateDynamicFontSize(totalSections) {
+            // Scale down font size as number of players increases
+            if (totalSections <= 4) {
+                return '1.4rem'; // Large font for 4 or fewer players
+            } else if (totalSections <= 8) {
+                return '1.2rem'; // Medium font for 5-8 players
+            } else if (totalSections <= 12) {
+                return '1.0rem'; // Smaller font for 9-12 players
+            } else if (totalSections <= 16) {
+                return '0.9rem'; // Even smaller for 13-16 players
+            } else if (totalSections <= 20) {
+                return '0.8rem'; // Small font for 17-20 players
+            } else if (totalSections <= 24) {
+                return '0.7rem'; // Very small for 21-24 players
+            } else {
+                // For more than 24 players, use a very small font
+                return '0.6rem';
+            }
+        }
+        
+        // Calculate optimal text radius based on number of players
+        function calculateTextRadius(totalSections, baseRadius) {
+            // Adjust text radius based on number of players for better positioning
+            if (totalSections <= 4) {
+                return baseRadius * 0.7; // Closer to center for fewer players
+            } else if (totalSections <= 8) {
+                return baseRadius * 0.6; // Standard position
+            } else if (totalSections <= 12) {
+                return baseRadius * 0.55; // Slightly closer to center
+            } else if (totalSections <= 16) {
+                return baseRadius * 0.5; // Closer to center for more players
+            } else {
+                return baseRadius * 0.45; // Very close to center for many players
+            }
+        }
+        
+        // Update roulette wheel with current players using perfect SVG alignment
         function updateRouletteWheel() {
             const wheel = document.getElementById('rouletteWheel');
             const totalSections = players.length;
@@ -1249,7 +1286,7 @@
                 return;
             }
             
-            // Create SVG for pie slices
+            // Create SVG for perfect pie slices
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             svg.setAttribute('width', '100%');
             svg.setAttribute('height', '100%');
@@ -1264,12 +1301,12 @@
             const radius = 290;
             const anglePerSection = 360 / totalSections;
             
-            // Create sections based on number of players
+            // Create sections with perfect alignment
             for (let i = 0; i < totalSections; i++) {
                 const startAngle = i * anglePerSection;
                 const endAngle = (i + 1) * anglePerSection;
                 
-                // Create SVG path for this slice
+                // Create SVG path for this slice with perfect alignment
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 path.setAttribute('d', createPieSlicePath(centerX, centerY, radius, startAngle, endAngle));
                 
@@ -1284,40 +1321,36 @@
                 
                 svg.appendChild(path);
                 
-                // Create text element for this slice
-                const textElement = document.createElement('div');
-                textElement.className = 'section-text';
-                textElement.textContent = players[i] || `Player ${i + 1}`;
+                // Create SVG text element for perfect positioning
+                const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 
-                // Position text in the middle of the slice
+                // Truncate player name if too long (max 20 characters)
+                let playerName = players[i] || `Player ${i + 1}`;
+                const maxLength = 20;
+                if (playerName.length > maxLength) {
+                    playerName = playerName.substring(0, maxLength) + '...';
+                }
+                textElement.textContent = playerName;
+                
+                // Calculate perfect text position along slice arc (moved up)
                 const textAngle = startAngle + (anglePerSection / 2);
-                
-                // Use consistent radius for all text
-                const textRadius = radius * 0.6;
+                const textRadius = calculateTextRadius(totalSections, radius) + 80; // Move text up by 20px
                 
                 const textX = centerX + textRadius * Math.cos((textAngle - 90) * Math.PI / 180);
                 const textY = centerY + textRadius * Math.sin((textAngle - 90) * Math.PI / 180);
                 
-                // Calculate rotation to align text with slice angle
-                // Add 90 degrees to account for text baseline, then rotate to match slice
-                const textRotation = textAngle + 90;
+                // Set text attributes for perfect positioning with 90-degree rotation
+                textElement.setAttribute('x', textX);
+                textElement.setAttribute('y', textY);
+                textElement.setAttribute('text-anchor', 'middle');
+                textElement.setAttribute('dominant-baseline', 'middle');
+                textElement.setAttribute('font-size', calculateDynamicFontSize(totalSections));
+                textElement.setAttribute('font-weight', '600');
+                textElement.setAttribute('fill', 'white');
+                textElement.setAttribute('text-shadow', '2px 2px 4px rgba(0,0,0,0.7)');
+                textElement.setAttribute('transform', `rotate(${textAngle + 90} ${textX} ${textY})`);
                 
-                textElement.style.position = 'absolute';
-                textElement.style.left = textX + 'px';
-                textElement.style.top = textY + 'px';
-                textElement.style.transform = `translate(-50%, -50%) rotate(${textRotation}deg)`;
-                textElement.style.zIndex = '10';
-                textElement.style.transformOrigin = 'center';
-                
-                // Use consistent font size for all text
-                textElement.style.fontSize = '1.2rem';
-                
-                // Add text overflow handling
-                textElement.style.overflow = 'hidden';
-                textElement.style.textOverflow = 'ellipsis';
-                textElement.style.whiteSpace = 'nowrap';
-                
-                wheel.appendChild(textElement);
+                svg.appendChild(textElement);
                 wheelSections.push({
                     element: textElement,
                     player: players[i],
