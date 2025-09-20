@@ -233,19 +233,37 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
             border-radius: 50%;
             border: 4px solid #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
             z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .wheel-center:hover:not(:disabled) {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.6);
+            background: linear-gradient(135deg, #c82333 0%, #d63384 100%);
+        }
+        
+        .wheel-center:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        
+        .wheel-center:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: translate(-50%, -50%) scale(1);
         }
         
         .pointer {
@@ -274,28 +292,6 @@
             border-top: 15px solid #c0392b;
         }
         
-        .spin-button {
-            background: linear-gradient(45deg, #dc3545, #e83e8c);
-            border: none;
-            border-radius: 50px;
-            padding: 1rem 3rem;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: white;
-            transition: all 0.3s ease;
-            margin: 2rem 0;
-            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
-        }
-        
-        .spin-button:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.4);
-        }
-        
-        .spin-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
         
         /* Winner Popup Overlay */
         .winner-popup-overlay {
@@ -660,10 +656,6 @@
                 font-size: 2rem;
             }
             
-            .spin-button {
-                padding: 0.8rem 2rem;
-                font-size: 1.1rem;
-            }
             
             .game-content {
                 max-width: 100%;
@@ -738,8 +730,8 @@
                 <div class="wheel-container" id="wheelContainer">
                     <div class="pointer"></div>
                     <div class="roulette-wheel" id="rouletteWheel">
-                        <div class="wheel-center">
-                            <i class="fas fa-star"></i>
+                        <div class="wheel-center" id="wheelCenter" onclick="spinWheel()">
+                            <i class="fas fa-play" id="centerIcon"></i>
                         </div>
                         <div class="empty-wheel-message" id="emptyWheelMessage">
                             <div class="empty-message-text">
@@ -751,9 +743,6 @@
                     </div>
                 </div>
                 
-                <button class="btn spin-button" id="spinButton" onclick="spinWheel()" disabled>
-                    <i class="fas fa-play"></i> Spin the Wheel
-                </button>
                 
                 <!-- Winner Popup Overlay -->
                 <div class="winner-popup-overlay" id="winnerPopupOverlay">
@@ -857,17 +846,19 @@
         
         // Show game controls
         function showGameControls() {
-            document.getElementById('spinButton').disabled = false;
-            document.getElementById('spinButton').innerHTML = '<i class="fas fa-play"></i> Spin the Wheel';
-            document.getElementById('actionButtons').style.display = 'flex';
+            const wheelCenter = document.getElementById('wheelCenter');
+            const centerIcon = document.getElementById('centerIcon');
+            wheelCenter.disabled = false;
+            centerIcon.className = 'fas fa-play';
             document.getElementById('emptyWheelMessage').style.display = 'none';
         }
         
         // Hide game controls
         function hideGameControls() {
-            document.getElementById('spinButton').disabled = true;
-            document.getElementById('spinButton').innerHTML = '<i class="fas fa-play"></i> Spin the Wheel';
-            document.getElementById('actionButtons').style.display = 'none';
+            const wheelCenter = document.getElementById('wheelCenter');
+            const centerIcon = document.getElementById('centerIcon');
+            wheelCenter.disabled = true;
+            centerIcon.className = 'fas fa-play';
             document.getElementById('emptyWheelMessage').style.display = 'block';
         }
         
@@ -919,13 +910,13 @@
             }
             
             // Clear any existing sections
-            wheel.innerHTML = '<div class="wheel-center"><i class="fas fa-star"></i></div>';
+            wheel.innerHTML = '<div class="wheel-center" id="wheelCenter" onclick="spinWheel()"><i class="fas fa-play" id="centerIcon"></i></div>';
             wheelSections = [];
             
             // If no players, show empty wheel message
             if (totalSections === 0) {
                 wheel.innerHTML = `
-                    <div class="wheel-center"><i class="fas fa-star"></i></div>
+                    <div class="wheel-center" id="wheelCenter" onclick="spinWheel()"><i class="fas fa-play" id="centerIcon"></i></div>
                 `;
                 return;
             }
@@ -1013,12 +1004,13 @@
             if (isSpinning || players.length === 0) return;
             
             isSpinning = true;
-            const spinButton = document.getElementById('spinButton');
+            const wheelCenter = document.getElementById('wheelCenter');
+            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             const winnerAnnouncement = document.getElementById('winnerAnnouncement');
             
-            spinButton.disabled = true;
-            spinButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Spinning...';
+            wheelCenter.disabled = true;
+            centerIcon.className = 'fas fa-spinner fa-spin';
             
             // Hide previous winner announcement
             winnerAnnouncement.classList.remove('show');
@@ -1138,12 +1130,13 @@
         }
         
         function resetButton() {
-            const spinButton = document.getElementById('spinButton');
+            const wheelCenter = document.getElementById('wheelCenter');
+            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             
             isSpinning = false;
-            spinButton.disabled = false;
-            spinButton.innerHTML = '<i class="fas fa-play"></i> Spin Again';
+            wheelCenter.disabled = false;
+            centerIcon.className = 'fas fa-play';
             wheel.classList.remove('spinning');
         }
         
