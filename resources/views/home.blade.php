@@ -324,7 +324,7 @@
             box-shadow: 0 30px 60px rgba(0,0,0,0.3);
             border: 3px solid #fff;
             position: relative;
-            max-width: 500px;
+            max-width: 650px;
             width: 90%;
             transform: scale(0.5) rotateY(180deg);
             transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -351,14 +351,6 @@
             100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
         
-        .winner-name {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 1rem;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            animation: bounceIn 0.8s ease-out 0.3s both;
-        }
         
         @keyframes bounceIn {
             0% {
@@ -377,11 +369,70 @@
             }
         }
         
-        .winner-number {
-            font-size: 1.4rem;
-            color: rgba(255,255,255,0.9);
+        .winner-name-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .winner-name {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: bounceIn 0.8s ease-out 0.3s both;
+            flex: 1;
+            min-width: 0;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+        
+        .copy-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             animation: slideInUp 0.6s ease-out 0.5s both;
+            flex-shrink: 0;
+            min-width: 45px;
+            min-height: 45px;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: scale(1.1);
+        }
+        
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .copy-btn.copied {
+            background: rgba(40, 167, 69, 0.8);
+            border-color: #28a745;
+        }
+        
+        .copy-btn.copied i {
+            animation: checkmark 0.3s ease;
+        }
+        
+        @keyframes checkmark {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         
         @keyframes slideInUp {
@@ -622,10 +673,20 @@
             
             .winner-name {
                 font-size: 2rem;
+                line-height: 1.1;
             }
             
-            .winner-number {
-                font-size: 1.1rem;
+            .copy-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+                min-width: 40px;
+                min-height: 40px;
+            }
+            
+            .winner-name-container {
+                flex-direction: column;
+                gap: 0.8rem;
             }
             
             .congratulations-text {
@@ -706,8 +767,12 @@
                             <div class="celebration-icon">🎁</div>
                         </div>
                         
-                        <div class="winner-name" id="winnerName"></div>
-                        <div class="winner-number" id="winnerNumber"></div>
+                        <div class="winner-name-container">
+                            <div class="winner-name" id="winnerName"></div>
+                            <button class="copy-btn" onclick="copyWinnerName()" title="Copy winner name">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
                         <div class="congratulations-text">🎉 Congratulations! 🎉</div>
                     </div>
                 </div>
@@ -1001,12 +1066,10 @@
         
         function showWinner(winner, winningNumber) {
             const winnerName = document.getElementById('winnerName');
-            const winnerNumber = document.getElementById('winnerNumber');
             const winnerPopupOverlay = document.getElementById('winnerPopupOverlay');
             const winnerAnnouncement = document.getElementById('winnerAnnouncement');
             
             winnerName.textContent = winner;
-            winnerNumber.textContent = `Winning Number: ${winningNumber}`;
             
             // Show popup overlay first
             winnerPopupOverlay.classList.add('show');
@@ -1031,6 +1094,43 @@
             setTimeout(() => {
                 winnerPopupOverlay.classList.remove('show');
             }, 300);
+        }
+        
+        function copyWinnerName() {
+            const winnerName = document.getElementById('winnerName');
+            const copyBtn = document.querySelector('.copy-btn');
+            const copyIcon = copyBtn.querySelector('i');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(winnerName.textContent).then(() => {
+                // Visual feedback
+                copyBtn.classList.add('copied');
+                copyIcon.className = 'fas fa-check';
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyIcon.className = 'fas fa-copy';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = winnerName.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Visual feedback for fallback
+                copyBtn.classList.add('copied');
+                copyIcon.className = 'fas fa-check';
+                
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyIcon.className = 'fas fa-copy';
+                }, 2000);
+            });
         }
         
         function resetButton() {
