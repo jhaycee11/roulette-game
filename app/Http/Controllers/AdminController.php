@@ -33,9 +33,15 @@ class AdminController extends Controller
             'password' => 'required'
         ]);
         
-        // Simple hardcoded admin credentials (in production, use proper authentication)
-        if ($request->username === 'admin' && $request->password === 'roulette2024') {
-            session(['admin_authenticated' => true]);
+        // Admin credentials: jhaycee and dessa with password "password"
+        $validCredentials = [
+            'jhaycee' => 'password',
+            'dessa' => 'password'
+        ];
+        
+        if (isset($validCredentials[$request->username]) && 
+            $validCredentials[$request->username] === $request->password) {
+            session(['admin_authenticated' => true, 'admin_user' => $request->username]);
             return redirect()->route('admin');
         }
         
@@ -44,7 +50,7 @@ class AdminController extends Controller
     
     public function logout()
     {
-        session()->forget('admin_authenticated');
+        session()->forget(['admin_authenticated', 'admin_user']);
         return redirect()->route('admin');
     }
     

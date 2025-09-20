@@ -192,6 +192,11 @@
                 <div class="col-md-8">
                     <h1 class="admin-title">
                         <i class="fas fa-shield-alt"></i> Admin Dashboard
+                        @if(session('admin_user'))
+                            <small class="d-block" style="font-size: 0.6em; font-weight: normal; opacity: 0.8;">
+                                Logged in as: {{ session('admin_user') }}
+                            </small>
+                        @endif
                     </h1>
                 </div>
                 <div class="col-md-4 text-end">
