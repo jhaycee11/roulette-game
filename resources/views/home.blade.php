@@ -674,24 +674,46 @@
             // Add spinning class
             wheel.classList.add('spinning');
             
-            // Calculate random winner
-            const winningNumber = Math.floor(Math.random() * players.length);
-            const winner = players[winningNumber];
+            // Calculate random extra spins (3-8 full rotations)
+            const extraSpins = Math.random() * 5 + 3;
+            const extraRotation = extraSpins * 360;
             
-            // Calculate final rotation
-            const totalSections = players.length;
-            const baseRotation = winningNumber * (360 / totalSections);
-            const extraSpins = Math.random() * 5 + 3; // 3-8 full rotations
-            const finalRotation = baseRotation + (extraSpins * 360);
+            // Calculate final rotation (just extra spins, winner determined by final position)
+            const finalRotation = extraRotation;
             
             // Set CSS variable for final rotation
             wheel.style.setProperty('--spin-rotation', `${finalRotation}deg`);
             
             // Show winner after animation completes
             setTimeout(() => {
-                showWinner(winner, winningNumber);
+                // Calculate winner based on final wheel position
+                const actualWinner = calculateWinnerFromPosition(finalRotation);
+                showWinner(actualWinner.winner, actualWinner.winnerNumber);
                 createConfetti();
             }, 4000);
+        }
+        
+        // Calculate winner based on final wheel position
+        function calculateWinnerFromPosition(finalRotation) {
+            const totalSections = players.length;
+            const anglePerSection = 360 / totalSections;
+            
+            // Normalize rotation to 0-360 range
+            const normalizedRotation = ((finalRotation % 360) + 360) % 360;
+            
+            // Calculate which section the arrow points to
+            // Arrow points to top (0 degrees), so we need to account for this
+            const sectionAngle = (360 - normalizedRotation) % 360;
+            const winnerNumber = Math.floor(sectionAngle / anglePerSection);
+            
+            // Ensure winner number is within valid range
+            const validWinnerNumber = winnerNumber % totalSections;
+            const winner = players[validWinnerNumber];
+            
+            return {
+                winner: winner,
+                winnerNumber: validWinnerNumber
+            };
         }
         
         function showWinner(winner, winningNumber) {
