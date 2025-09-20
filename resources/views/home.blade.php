@@ -357,6 +357,34 @@
             margin: 0 auto;
         }
         
+        .empty-wheel-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 15;
+            color: #6c757d;
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .empty-message-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+        
+        .empty-message-text i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.7;
+        }
+        
+        .empty-message-text small {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
         @media (max-width: 768px) {
             .main-container {
                 flex-direction: column;
@@ -417,21 +445,28 @@
             <div class="game-content">
                 <div class="game-title">
                     <h1><i class="fas fa-dice"></i> Roulette Game</h1>
-                    <p>Enter player names in the textarea and spin the wheel to find your winner!</p>
+                    <p>Add player names to the list and spin the wheel to find your winner!</p>
                 </div>
                 
                 
                 <!-- Roulette Wheel (always visible now) -->
-                <div class="wheel-container" id="wheelContainer" style="display: none;">
+                <div class="wheel-container" id="wheelContainer">
                     <div class="pointer"></div>
                     <div class="roulette-wheel" id="rouletteWheel">
                         <div class="wheel-center">
                             <i class="fas fa-star"></i>
                         </div>
+                        <div class="empty-wheel-message" id="emptyWheelMessage">
+                            <div class="empty-message-text">
+                                <i class="fas fa-plus-circle"></i><br>
+                                Add players to start spinning!<br>
+                                <small>Enter names in the textarea</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <button class="btn spin-button" id="spinButton" onclick="spinWheel()" style="display: none;">
+                <button class="btn spin-button" id="spinButton" onclick="spinWheel()" disabled>
                     <i class="fas fa-play"></i> Spin the Wheel
                 </button>
                 
@@ -521,16 +556,18 @@
         
         // Show game controls
         function showGameControls() {
-            document.getElementById('wheelContainer').style.display = 'block';
-            document.getElementById('spinButton').style.display = 'inline-block';
+            document.getElementById('spinButton').disabled = false;
+            document.getElementById('spinButton').innerHTML = '<i class="fas fa-play"></i> Spin the Wheel';
             document.getElementById('actionButtons').style.display = 'flex';
+            document.getElementById('emptyWheelMessage').style.display = 'none';
         }
         
         // Hide game controls
         function hideGameControls() {
-            document.getElementById('wheelContainer').style.display = 'none';
-            document.getElementById('spinButton').style.display = 'none';
+            document.getElementById('spinButton').disabled = true;
+            document.getElementById('spinButton').innerHTML = '<i class="fas fa-play"></i> Spin the Wheel';
             document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById('emptyWheelMessage').style.display = 'block';
         }
         
         // Reset game
@@ -576,13 +613,28 @@
             const wheel = document.getElementById('rouletteWheel');
             const totalSections = players.length;
             
-            if (!wheel || totalSections === 0) {
+            if (!wheel) {
                 return;
             }
             
             // Clear any existing sections
             wheel.innerHTML = '<div class="wheel-center"><i class="fas fa-star"></i></div>';
             wheelSections = [];
+            
+            // If no players, show empty wheel message
+            if (totalSections === 0) {
+                wheel.innerHTML = `
+                    <div class="wheel-center"><i class="fas fa-star"></i></div>
+                    <div class="empty-wheel-message" id="emptyWheelMessage">
+                        <div class="empty-message-text">
+                            <i class="fas fa-plus-circle"></i><br>
+                            Add players to start spinning!<br>
+                            <small>Enter names in the textarea</small>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
             
             // Create SVG for pie slices
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -784,8 +836,10 @@
             // Auto-focus the textarea
             playersTextarea.focus();
             
-            // Initialize with empty player list (session players removed)
-            // Players will now only be loaded when manually added by the user
+            // Initialize with empty player list and show empty wheel
+            players = [];
+            updateRouletteWheel();
+            hideGameControls();
         });
     </script>
 </body>
