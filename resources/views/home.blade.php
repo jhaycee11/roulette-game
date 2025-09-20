@@ -510,8 +510,8 @@
                     return;
                 }
                 
-                // Remove duplicates while preserving order
-                players = [...new Set(newPlayers)];
+                // Accept duplicate entries - keep all players as entered
+                players = newPlayers;
                 
                 // Update roulette wheel and show game controls
                 updateRouletteWheel();
