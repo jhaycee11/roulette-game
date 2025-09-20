@@ -1334,7 +1334,34 @@
                 
                 // Calculate perfect text position along slice arc (moved up)
                 const textAngle = startAngle + (anglePerSection / 2);
-                const textRadius = calculateTextRadius(totalSections, radius) + 80; // Move text up by 20px
+                
+                // Dynamic text radius adjustment based on number of entries
+                let radiusAdjustment = 5; // Default for 1-20 entries
+                if (totalSections >= 20 && totalSections < 100) {
+                    radiusAdjustment = 20;
+                } else if (totalSections >= 100 && totalSections < 200) {
+                    radiusAdjustment = 30;
+                } else if (totalSections >= 200 && totalSections < 300) {
+                    radiusAdjustment = 40;
+                } else if (totalSections >= 300 && totalSections < 400) {
+                    radiusAdjustment = 50;
+                } else if (totalSections >= 400 && totalSections < 500) {
+                    radiusAdjustment = 60;
+                } else if (totalSections >= 500 && totalSections < 600) {
+                    radiusAdjustment = 65;
+                } else if (totalSections >= 600 && totalSections < 700) {
+                    radiusAdjustment = 70;
+                } else if (totalSections >= 700 && totalSections < 800) {
+                    radiusAdjustment = 75;
+                } else if (totalSections >= 800 && totalSections < 900) {
+                    radiusAdjustment = 80;
+                } else if (totalSections >= 900 && totalSections < 1000) {
+                    radiusAdjustment = 80;
+                } else if (totalSections >= 1000) {
+                    radiusAdjustment = 85;
+                }
+                
+                const textRadius = calculateTextRadius(totalSections, radius) + radiusAdjustment;
                 
                 const textX = centerX + textRadius * Math.cos((textAngle - 90) * Math.PI / 180);
                 const textY = centerY + textRadius * Math.sin((textAngle - 90) * Math.PI / 180);
