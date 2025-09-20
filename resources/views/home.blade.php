@@ -145,22 +145,21 @@
             position: absolute;
             width: 50%;
             height: 50%;
-            transform-origin: 100% 100%;
-            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: 50% 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
             font-size: 0.9rem;
-            color: #2c3e50;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
             text-align: center;
             line-height: 1.2;
             overflow: hidden;
             z-index: 10;
-            padding: 6px;
+            padding: 8px;
             box-sizing: border-box;
-            border: 1px solid rgba(44, 62, 80, 0.1);
+            border: 2px solid rgba(255,255,255,0.3);
         }
         
         .wheel-section .section-text {
@@ -550,6 +549,28 @@
             return textAngle;
         }
         
+        // Create SVG path for pie slice
+        function createPieSlicePath(centerX, centerY, radius, startAngle, endAngle) {
+            const start = polarToCartesian(centerX, centerY, radius, endAngle);
+            const end = polarToCartesian(centerX, centerY, radius, startAngle);
+            const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+            return [
+                "M", centerX, centerY,
+                "L", start.x, start.y,
+                "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+                "Z"
+            ].join(" ");
+        }
+        
+        // Convert polar coordinates to cartesian
+        function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+            const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+            return {
+                x: centerX + (radius * Math.cos(angleInRadians)),
+                y: centerY + (radius * Math.sin(angleInRadians))
+            };
+        }
+        
         // Update roulette wheel with current players
         function updateRouletteWheel() {
             const wheel = document.getElementById('rouletteWheel');
@@ -563,22 +584,60 @@
             wheel.innerHTML = '<div class="wheel-center"><i class="fas fa-star"></i></div>';
             wheelSections = [];
             
+            // Create SVG for pie slices
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.setAttribute('viewBox', '0 0 400 400');
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.zIndex = '5';
+            
+            const centerX = 200;
+            const centerY = 200;
+            const radius = 190;
+            const anglePerSection = 360 / totalSections;
+            
             // Create sections based on number of players
             for (let i = 0; i < totalSections; i++) {
-                const section = document.createElement('div');
-                section.className = 'wheel-section';
-                section.style.transform = `rotate(${i * (360 / totalSections)}deg)`;
+                const startAngle = i * anglePerSection;
+                const endAngle = (i + 1) * anglePerSection;
                 
-                // Assign player to section
-                const playerName = players[i] || `Player ${i + 1}`;
+                // Create SVG path for this slice
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', createPieSlicePath(centerX, centerY, radius, startAngle, endAngle));
                 
-                // Create text element with rotation
+                // Assign alternating colors for slices
+                if (i % 2 === 0) {
+                    path.setAttribute('fill', '#e74c3c'); // Red
+                } else {
+                    path.setAttribute('fill', '#3498db'); // Blue
+                }
+                path.setAttribute('stroke', 'rgba(255,255,255,0.3)');
+                path.setAttribute('stroke-width', '2');
+                
+                svg.appendChild(path);
+                
+                // Create text element for this slice
                 const textElement = document.createElement('div');
                 textElement.className = 'section-text';
-                textElement.textContent = playerName;
+                textElement.textContent = players[i] || `Player ${i + 1}`;
+                
+                // Position text in the middle of the slice
+                const textAngle = startAngle + (anglePerSection / 2);
+                const textRadius = radius * 0.6;
+                const textX = centerX + textRadius * Math.cos((textAngle - 90) * Math.PI / 180);
+                const textY = centerY + textRadius * Math.sin((textAngle - 90) * Math.PI / 180);
+                
+                textElement.style.position = 'absolute';
+                textElement.style.left = textX + 'px';
+                textElement.style.top = textY + 'px';
+                textElement.style.transform = 'translate(-50%, -50%)';
+                textElement.style.zIndex = '10';
                 
                 // Adjust font size based on name length
-                const nameLength = playerName.length;
+                const nameLength = (players[i] || '').length;
                 if (nameLength > 15) {
                     textElement.style.fontSize = '0.7rem';
                 } else if (nameLength > 10) {
@@ -587,18 +646,15 @@
                     textElement.style.fontSize = '1rem';
                 }
                 
-                // Calculate and apply text rotation
-                const textRotation = calculateTextRotation(i, totalSections);
-                textElement.style.transform = `translate(-50%, -50%) rotate(${textRotation}deg)`;
-                
-                section.appendChild(textElement);
-                wheel.appendChild(section);
+                wheel.appendChild(textElement);
                 wheelSections.push({
-                    element: section,
+                    element: textElement,
                     player: players[i],
                     number: i
                 });
             }
+            
+            wheel.appendChild(svg);
         }
         
         function spinWheel() {
