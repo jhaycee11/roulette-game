@@ -19,23 +19,29 @@
         
         .main-container {
             display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: calc(100vh - 4rem);
             padding: 2rem 0;
             overflow-x: hidden;
+            position: relative;
         }
         
         .game-section {
-            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 0 2rem;
             position: relative;
-            order: 1;
+            max-width: 600px;
+            width: 100%;
         }
         
         .player-section {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
             width: 300px;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
@@ -43,13 +49,11 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
-            margin-left: 2rem;
             transition: transform 0.3s ease;
             max-height: 80vh;
             overflow-y: auto;
             overflow-x: hidden;
-            position: relative;
-            order: 2;
+            z-index: 10;
         }
         
         .player-section.collapsed {
@@ -132,7 +136,7 @@
             padding: 1rem;
             transition: border-color 0.3s ease;
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 3;
         }
         
         .player-input-area textarea:focus {
@@ -430,12 +434,17 @@
                 flex-direction: column;
                 overflow-x: hidden;
                 min-height: calc(100vh - 2rem);
+                justify-content: flex-start;
+                align-items: center;
             }
             
             .player-section {
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 2rem;
+                position: fixed;
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                width: auto;
+                z-index: 1000;
             }
             
             .player-section.collapsed {
@@ -491,7 +500,7 @@
                     class="form-control" 
                     id="playersTextarea" 
                     rows="10" 
-                    placeholder="Enter player names, one per line...&#10;&#10;Example:&#10;John Doe&#10;Jane Smith&#10;Mike Johnson&#10;&#10;The roulette will update automatically as you type!"
+                    placeholder="Enter player names"
                     style="resize: vertical; min-height: 200px;"
                 ></textarea>
             </div>
@@ -502,7 +511,6 @@
             <div class="game-content">
                 <div class="game-title">
                     <h1><i class="fas fa-dice"></i> Roulette Game</h1>
-                    <p>Add player names to the list and spin the wheel to find your winner!</p>
                 </div>
                 
                 
