@@ -22,8 +22,8 @@ RUN php artisan config:cache || true
 RUN php artisan route:cache || true
 RUN php artisan view:cache || true
 
-# Expose port
-EXPOSE 8080
+# Use Render's dynamic port
+ENV PORT=${PORT}
 
-# Start Laravel server
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+# Start Laravel server on dynamic port
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$PORT"]
