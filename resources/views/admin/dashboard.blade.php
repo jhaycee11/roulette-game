@@ -154,20 +154,6 @@
             color: white;
         }
         
-        .clear-winners-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            border: none;
-            border-radius: 10px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .clear-winners-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
         
         .btn-success {
             background: linear-gradient(45deg, #28a745, #20c997);
@@ -288,35 +274,7 @@
         </div>
         
         <div class="row">
-            <div class="col-lg-6">
-                <div class="recent-winners-card">
-                    <h4 class="mb-3">
-                        <i class="fas fa-list"></i> Recent Winners
-                    </h4>
-                    
-                    @if($stats['recent_winners']->count() > 0)
-                        @foreach($stats['recent_winners'] as $winner)
-                            <div class="winner-item">
-                                <div>
-                                    <div class="winner-name">{{ $winner->name }}</div>
-                                    <div class="winner-date">
-                                        <i class="fas fa-calendar-alt me-1"></i>
-                                        {{ $winner->played_at->format('M d, Y h:i A') }}
-                                    </div>
-                                </div>
-                                <div class="winner-number">{{ $winner->winning_number }}</div>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-trophy fa-3x mb-3"></i>
-                            <p>No recent winners to display</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-            
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="recent-winners-card">
                     <h4 class="mb-3">
                         <i class="fas fa-star"></i> Next to Win
@@ -373,21 +331,9 @@
                     </div>
                     
                     <div class="d-grid gap-2">
-                        <button class="btn clear-winners-btn" onclick="clearWinners()">
-                            <i class="fas fa-trash"></i> Clear All Winners
-                        </button>
-                        
                         <button class="btn btn-warning" onclick="clearNextToWin()">
                             <i class="fas fa-star"></i> Clear Next to Win List
                         </button>
-                        
-                        <a href="{{ route('winners') }}" class="btn btn-secondary">
-                            <i class="fas fa-list"></i> View All Winners
-                        </a>
-                        
-                        <a href="{{ route('home') }}" class="btn btn-secondary">
-                            <i class="fas fa-home"></i> Back to Game
-                        </a>
                     </div>
                 </div>
             </div>
@@ -396,31 +342,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function clearWinners() {
-            if (confirm('Are you sure you want to clear all winners? This action cannot be undone.')) {
-                fetch('{{ route("admin.clear.winners") }}', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
-                        location.reload();
-                    } else if (data.error) {
-                        alert(data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while clearing winners.');
-                });
-            }
-        }
-        
         function clearNextToWin() {
             if (confirm('Are you sure you want to clear the Next to Win list? This action cannot be undone.')) {
                 fetch('{{ route("admin.clear.next.to.win") }}', {

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use App\Models\Winner;
 use Illuminate\Support\Facades\Validator;
 
 class GameController extends Controller
@@ -72,13 +71,6 @@ class GameController extends Controller
         // Select winning section
         $winningSection = rand(0, $totalSections - 1);
         $winner = $wheelSections[$winningSection];
-        
-        // Store winner in database
-        Winner::create([
-            'name' => $winner,
-            'winning_number' => $winningSection,
-            'played_at' => now()
-        ]);
         
         return response()->json([
             'winner' => $winner,
