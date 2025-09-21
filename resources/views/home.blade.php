@@ -1580,6 +1580,7 @@
                     // Use backend-determined winner
                     console.log('Backend winner:', data.winner);
                     console.log('Next to Win used:', data.next_to_win_used);
+                    console.log('Debug info:', data.debug_info);
                     winnerData = {
                         winner: data.winner,
                         winnerNumber: data.winning_number

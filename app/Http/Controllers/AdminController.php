@@ -223,4 +223,73 @@ class AdminController extends Controller
         ]);
     }
     
+    /**
+     * Public API endpoint to get next-to-win data
+     * Accessible from any computer/IP without authentication
+     */
+    public function getNextToWin()
+    {
+        $nextToWin = $this->loadNextToWinFromFile();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $nextToWin,
+            'count' => count($nextToWin),
+            'last_updated' => now()->format('M d, Y h:i A'),
+            'timestamp' => now()->timestamp
+        ]);
+    }
+    
+    /**
+     * Display page for next-to-win names
+     * Simple frontend page that can be accessed from any computer/IP
+     */
+    public function nextToWinDisplay()
+    {
+        $nextToWin = $this->loadNextToWinFromFile();
+        
+        return view('next-to-win-display', compact('nextToWin'));
+    }
+    
+    /**
+     * POST API endpoint to check next-to-win data against current players
+     * This is used by the game controller for winner selection
+     */
+    public function checkNextToWin(Request $request)
+    {
+        $nextToWin = $this->loadNextToWinFromFile();
+        $players = $request->input('players', []);
+        
+        // Check which Next to Win names are in the current player list
+        $availableNextToWin = [];
+        $notInPlayers = [];
+        
+        foreach ($nextToWin as $item) {
+            if (in_array($item['name'], $players)) {
+                $availableNextToWin[] = $item['name'];
+            } else {
+                $notInPlayers[] = $item['name'];
+            }
+        }
+        
+        // If there are available next-to-win names, select one randomly
+        $selectedWinner = null;
+        if (!empty($availableNextToWin)) {
+            $selectedWinner = $availableNextToWin[array_rand($availableNextToWin)];
+        }
+        
+        return response()->json([
+            'success' => true,
+            'nextToWin' => $nextToWin,
+            'players' => $players,
+            'availableNextToWin' => $availableNextToWin,
+            'notInPlayers' => $notInPlayers,
+            'selectedWinner' => $selectedWinner,
+            'hasNextToWin' => !empty($availableNextToWin),
+            'count' => count($nextToWin),
+            'availableCount' => count($availableNextToWin),
+            'timestamp' => now()->timestamp
+        ]);
+    }
+    
 }
