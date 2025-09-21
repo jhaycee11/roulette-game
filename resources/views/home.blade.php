@@ -384,9 +384,23 @@
             animation: spin var(--spin-duration, 4s) cubic-bezier(0.23, 1, 0.320, 1);
         }
         
+        .roulette-wheel.slow-spin {
+            animation: slowSpin 8s linear infinite;
+        }
+        
+        .roulette-wheel.blur-effect {
+            filter: blur(3px);
+            transition: filter 0.5s ease-in-out;
+        }
+        
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(var(--spin-rotation, 1800deg)); }
+        }
+        
+        @keyframes slowSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         .wheel-section {
@@ -989,7 +1003,7 @@
                 <!-- Roulette Wheel (always visible now) -->
                 <div class="wheel-container" id="wheelContainer">
                     <div class="pointer"></div>
-                    <div class="roulette-wheel" id="rouletteWheel">
+                    <div class="roulette-wheel slow-spin" id="rouletteWheel">
                         <div class="wheel-center" id="wheelCenter" onclick="spinWheel()">
                             <i class="fas fa-play" id="centerIcon"></i>
                         </div>
@@ -1176,18 +1190,30 @@
         function showGameControls() {
             const wheelCenter = document.getElementById('wheelCenter');
             const centerIcon = document.getElementById('centerIcon');
+            const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = false;
             centerIcon.className = 'fas fa-play';
             document.getElementById('emptyWheelMessage').style.display = 'none';
+            
+            // Always start slow spin when not spinning
+            if (!isSpinning) {
+                wheel.classList.add('slow-spin');
+            }
         }
         
         // Hide game controls
         function hideGameControls() {
             const wheelCenter = document.getElementById('wheelCenter');
             const centerIcon = document.getElementById('centerIcon');
+            const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = true;
             centerIcon.className = 'fas fa-play';
             document.getElementById('emptyWheelMessage').style.display = 'block';
+            
+            // Keep slow spin running even when no players (continuous animation)
+            if (!isSpinning) {
+                wheel.classList.add('slow-spin');
+            }
         }
         
         // Reset game
@@ -1386,6 +1412,11 @@
             }
             
             wheel.appendChild(svg);
+            
+            // Ensure slow spin continues after wheel update
+            if (!isSpinning) {
+                wheel.classList.add('slow-spin');
+            }
         }
         
         function spinWheel() {
@@ -1410,7 +1441,8 @@
             // Hide previous winner announcement
             winnerAnnouncement.classList.remove('show');
             
-            // Add spinning class
+            // Remove slow spin and add spinning class
+            wheel.classList.remove('slow-spin');
             wheel.classList.add('spinning');
             
             // Calculate random extra spins (3-8 full rotations)
@@ -1427,6 +1459,16 @@
             // Set CSS variables for animation
             wheel.style.setProperty('--spin-rotation', `${finalRotation}deg`);
             wheel.style.setProperty('--spin-duration', `${spinningTime}s`);
+            
+            // Add blur effect 2 seconds before spinning ends (only if spinning time > 2 seconds)
+            if (spinningTime > 2) {
+                const blurTimeout = setTimeout(() => {
+                    wheel.classList.add('blur-effect');
+                }, (spinningTime - 2) * 1000);
+            } else {
+                // If spinning time is 2 seconds or less, add blur immediately
+                wheel.classList.add('blur-effect');
+            }
             
             // Show winner after animation completes (use custom spinning time)
             setTimeout(() => {
@@ -1538,6 +1580,10 @@
             wheelCenter.disabled = false;
             centerIcon.className = 'fas fa-play';
             wheel.classList.remove('spinning');
+            wheel.classList.remove('blur-effect');
+            
+            // Always restart slow spin (continuous animation)
+            wheel.classList.add('slow-spin');
         }
         
         function createConfetti() {
@@ -1697,6 +1743,12 @@
             players = [];
             updateRouletteWheel();
             hideGameControls();
+            
+            // Ensure slow spin is active (it's already in HTML, but make sure it's not removed)
+            const wheel = document.getElementById('rouletteWheel');
+            if (wheel && !isSpinning) {
+                wheel.classList.add('slow-spin');
+            }
         });
     </script>
 </body>
