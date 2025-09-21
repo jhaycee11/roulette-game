@@ -53,7 +53,7 @@
             border: 1px solid rgba(255,255,255,0.2);
             transition: transform 0.3s ease;
             max-height: 80vh;
-            overflow-y: auto;
+            overflow-y: hidden;
             overflow-x: hidden;
             z-index: 10;
         }
@@ -982,12 +982,17 @@
             </div>
             
             <div class="player-input-area">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <button class="btn btn-outline-secondary btn-sm" id="shuffleBtn">
+                        <i class="fas fa-random"></i> Shuffle
+                    </button>
+                </div>
                 <textarea 
                     class="form-control" 
                     id="playersTextarea" 
                     rows="10" 
                     placeholder="Enter player names"
-                    style="resize: vertical; min-height: 500px;"
+                    style="resize: vertical; min-height: 300px; overflow-y: auto;"
                 ></textarea>
             </div>
         </div>
@@ -1161,6 +1166,10 @@
                     players = [];
                     updateRouletteWheel();
                     hideGameControls();
+                    
+                    // Disable shuffle button
+                    const shuffleBtn = document.getElementById('shuffleBtn');
+                    shuffleBtn.disabled = true;
                     return;
                 }
                 
@@ -1174,6 +1183,10 @@
                     players = newPlayers;
                     updateRouletteWheel();
                     hideGameControls();
+                    
+                    // Disable shuffle button
+                    const shuffleBtn = document.getElementById('shuffleBtn');
+                    shuffleBtn.disabled = true;
                     return;
                 }
                 
@@ -1183,6 +1196,16 @@
                 // Update roulette wheel and show game controls
                 updateRouletteWheel();
                 showGameControls();
+                
+                // Enable shuffle button if we have enough players
+                const shuffleBtn = document.getElementById('shuffleBtn');
+                if (newPlayers.length >= 2) {
+                    shuffleBtn.disabled = false;
+                    console.log('Shuffle button enabled for', newPlayers.length, 'players');
+                } else {
+                    shuffleBtn.disabled = true;
+                    console.log('Shuffle button disabled for', newPlayers.length, 'players');
+                }
             }, 500); // 500ms delay to avoid too frequent updates
         }
         
@@ -1213,6 +1236,69 @@
             // Keep slow spin running even when no players (continuous animation)
             if (!isSpinning) {
                 wheel.classList.add('slow-spin');
+            }
+        }
+        
+        // Shuffle players list and update both textarea and roulette wheel
+        function shufflePlayers() {
+            console.log('Shuffle function called, players count:', players.length);
+            
+            // Check if we have enough players
+            if (players.length < 2) {
+                alert('You need at least 2 players to shuffle!');
+                return false;
+            }
+            
+            try {
+                // Shuffle the players array using Fisher-Yates algorithm
+                const shuffledPlayers = [...players];
+                for (let i = shuffledPlayers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
+                }
+                
+                console.log('Original players:', players);
+                console.log('Shuffled players:', shuffledPlayers);
+                
+                // Update the players array
+                players = shuffledPlayers;
+                
+                // Update the textarea with shuffled names
+                const textarea = document.getElementById('playersTextarea');
+                if (textarea) {
+                    textarea.value = players.join('\n');
+                } else {
+                    console.error('Textarea not found!');
+                    return false;
+                }
+                
+                // Update the roulette wheel with new order
+                updateRouletteWheel();
+                
+                // Show visual feedback
+                const shuffleBtn = document.getElementById('shuffleBtn');
+                if (shuffleBtn) {
+                    const originalText = shuffleBtn.innerHTML;
+                    shuffleBtn.innerHTML = '<i class="fas fa-check"></i> Shuffled!';
+                    shuffleBtn.classList.remove('btn-outline-secondary');
+                    shuffleBtn.classList.add('btn-success');
+                    
+                    // Reset button after 1 second
+                    setTimeout(() => {
+                        shuffleBtn.innerHTML = originalText;
+                        shuffleBtn.classList.remove('btn-success');
+                        shuffleBtn.classList.add('btn-outline-secondary');
+                    }, 1000);
+                } else {
+                    console.error('Shuffle button not found for feedback!');
+                }
+                
+                console.log('Shuffle completed successfully');
+                return true;
+            } catch (error) {
+                console.error('Error during shuffle:', error);
+                alert('An error occurred while shuffling. Please try again.');
+                return false;
             }
         }
         
@@ -1738,6 +1824,32 @@
             
             // Auto-focus the textarea
             playersTextarea.focus();
+            
+            // Test shuffle button functionality
+            const shuffleBtn = document.getElementById('shuffleBtn');
+            console.log('Shuffle button found:', shuffleBtn);
+            console.log('Shuffle button disabled:', shuffleBtn.disabled);
+            
+            // Add event listener for shuffle button
+            if (shuffleBtn) {
+                shuffleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Shuffle button clicked!');
+                    console.log('Button disabled state:', this.disabled);
+                    console.log('Players array:', players);
+                    
+                    // Test if button is actually clickable
+                    if (this.disabled) {
+                        console.log('Button is disabled, cannot shuffle');
+                        return;
+                    }
+                    
+                    shufflePlayers();
+                });
+                console.log('Shuffle button event listener added');
+            } else {
+                console.error('Shuffle button not found!');
+            }
             
             // Initialize with empty player list and show empty wheel
             players = [];
