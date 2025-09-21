@@ -1734,8 +1734,77 @@
         }
         
         function showDebugInfo() {
-            // Use only client-side debug info (no backend calls)
-            showFallbackDebugInfo();
+            // Try backend first, fallback to client-side if it fails
+            fetch('{{ route("admin.debug.next.to.win") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    players: players
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                let debugInfo = '=== 🎯 NEXT TO WIN DEBUG INFO ===\n\n';
+                
+                // Summary
+                debugInfo += `📊 SUMMARY:\n`;
+                debugInfo += `• Next to Win entries: ${data.count}\n`;
+                debugInfo += `• Current players: ${data.playerCount}\n`;
+                debugInfo += `• Available in players: ${data.availableCount}\n`;
+                debugInfo += `• NOT in players: ${data.notAvailableCount}\n\n`;
+                
+                if (data.nextToWin && data.nextToWin.length > 0) {
+                    debugInfo += `=== NEXT TO WIN LIST ===\n\n`;
+                    
+                    data.comparison.forEach((item) => {
+                        const status = item.is_in_players ? '✅ IN PLAYERS' : '❌ NOT IN PLAYERS';
+                        debugInfo += `${item.index}. "${item.name}" ${status}\n`;
+                        debugInfo += `   Added by: ${item.added_by}\n`;
+                        debugInfo += `   Added at: ${item.added_at}\n\n`;
+                    });
+                    
+                    if (data.availableInPlayers.length > 0) {
+                        debugInfo += `=== AVAILABLE IN PLAYERS ===\n`;
+                        debugInfo += data.availableInPlayers.join(', ') + '\n\n';
+                    }
+                    
+                    if (data.notInPlayers.length > 0) {
+                        debugInfo += `=== NOT IN PLAYERS ===\n`;
+                        debugInfo += data.notInPlayers.join(', ') + '\n\n';
+                    }
+                } else {
+                    debugInfo += 'No entries in Next to Win list.\n\n';
+                }
+                
+                if (data.players && data.players.length > 0) {
+                    debugInfo += `=== CURRENT PLAYER LIST ===\n`;
+                    debugInfo += data.players.join(', ') + '\n\n';
+                } else {
+                    debugInfo += 'No players in current game.\n\n';
+                }
+                
+                debugInfo += '=== Raw JSON Data ===\n';
+                debugInfo += JSON.stringify(data, null, 2);
+                
+                // Show debug info
+                alert(debugInfo);
+                
+                // Also log to console
+                console.log('=== NEXT TO WIN DEBUG ===', data);
+            })
+            .catch(error => {
+                console.error('Backend debug failed:', error);
+                // Fallback to client-side debug
+                showFallbackDebugInfo();
+            });
         }
         
         // Comprehensive debug function that works without backend

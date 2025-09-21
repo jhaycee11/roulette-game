@@ -11,7 +11,13 @@ class AdminController extends Controller
 {
     private function getJsonFilePath()
     {
-        return public_path('storage/save/nexttowin.json');
+        $path = public_path('storage/save/nexttowin.json');
+        \Log::info('Next to Win file path', [
+            'path' => $path,
+            'publicPath' => public_path(),
+            'storagePath' => storage_path()
+        ]);
+        return $path;
     }
     
     private function loadNextToWinFromFile()
@@ -144,8 +150,23 @@ class AdminController extends Controller
         }
         
         try {
+            $filePath = $this->getJsonFilePath();
+            \Log::info('Attempting to clear Next to Win list', [
+                'filePath' => $filePath,
+                'fileExists' => File::exists($filePath),
+                'directory' => dirname($filePath),
+                'directoryExists' => File::exists(dirname($filePath)),
+                'directoryWritable' => is_writable(dirname($filePath))
+            ]);
+            
             // Clear the JSON file
             $success = $this->saveNextToWinToFile([]);
+            
+            \Log::info('Clear Next to Win result', [
+                'success' => $success,
+                'fileExistsAfter' => File::exists($filePath),
+                'fileContentAfter' => File::exists($filePath) ? File::get($filePath) : 'File not found'
+            ]);
             
             if ($success) {
                 return response()->json(['message' => 'Next to Win list cleared successfully']);
