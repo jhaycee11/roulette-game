@@ -30,15 +30,14 @@ RUN echo 'APP_NAME="Roulette Game"' > .env \
     && echo 'APP_URL=http://localhost' >> .env \
     && echo 'DB_CONNECTION=sqlite' >> .env \
     && echo 'DB_DATABASE=/var/www/database/database.sqlite' >> .env \
-    && echo 'SESSION_DRIVER=database' >> .env \
-    && echo 'CACHE_STORE=database' >> .env \
-    && echo 'QUEUE_CONNECTION=database' >> .env \
+    && echo 'SESSION_DRIVER=file' >> .env \
+    && echo 'CACHE_STORE=file' >> .env \
+    && echo 'QUEUE_CONNECTION=sync' >> .env \
     && php artisan key:generate --force \
     && php artisan storage:link \
     && mkdir -p storage/framework/{cache,views,sessions} bootstrap/cache public/storage/save \
     && chmod -R 775 storage bootstrap/cache \
-    && touch database/database.sqlite \
-    && php artisan migrate --force
+    && touch database/database.sqlite
 
 # Expose port
 EXPOSE 8000
