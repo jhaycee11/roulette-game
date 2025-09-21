@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\AdminController;
-use ReflectionClass;
 
 // Home page with player name input
 Route::get('/', [GameController::class, 'index'])->name('home');
