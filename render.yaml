@@ -1,12 +1,31 @@
 services:
   - type: web
-    name: laravel-app
+    name: roulette-game
     env: docker
     plan: free
     buildCommand: |
       composer install --no-dev --optimize-autoloader
+      php artisan key:generate
       php artisan storage:link
       mkdir -p storage/framework/{cache,views,sessions} bootstrap/cache
+      mkdir -p public/storage/save
       chmod -R 775 storage bootstrap/cache
+      touch database/database.sqlite
+      php artisan migrate --force
     startCommand: |
       php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/database/database.sqlite
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
