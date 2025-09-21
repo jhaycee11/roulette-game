@@ -1556,11 +1556,51 @@
                 wheel.classList.add('blur-effect');
             }
             
+            // Store winner data for later display
+            let winnerData = null;
+            
+            // Call backend to get winner (considering Next to Win logic)
+            fetch('{{ route("spin") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    players: players
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error from backend:', data.error);
+                    // Fallback to frontend calculation
+                    winnerData = calculateWinnerFromPosition(finalRotation);
+                } else {
+                    // Use backend-determined winner
+                    console.log('Backend winner:', data.winner);
+                    console.log('Next to Win used:', data.next_to_win_used);
+                    winnerData = {
+                        winner: data.winner,
+                        winnerNumber: data.winning_number
+                    };
+                }
+            })
+            .catch(error => {
+                console.error('Error calling backend:', error);
+                // Fallback to frontend calculation
+                winnerData = calculateWinnerFromPosition(finalRotation);
+            });
+            
             // Show winner after animation completes (use custom spinning time)
             setTimeout(() => {
-                // Calculate winner based on final wheel position
-                const actualWinner = calculateWinnerFromPosition(finalRotation);
-                showWinner(actualWinner.winner, actualWinner.winnerNumber);
+                if (winnerData) {
+                    showWinner(winnerData.winner, winnerData.winnerNumber);
+                } else {
+                    // Final fallback
+                    const actualWinner = calculateWinnerFromPosition(finalRotation);
+                    showWinner(actualWinner.winner, actualWinner.winnerNumber);
+                }
                 createConfetti();
             }, spinningTime * 1000);
         }

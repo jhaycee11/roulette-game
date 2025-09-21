@@ -77,14 +77,13 @@ class GameController extends Controller
             return response()->json(['error' => 'No players found'], 400);
         }
 
-        // Check if there's a "Next to Win" list and if it should be used
+        // Check if there's a "Next to Win" list and if any names are in the current players list
         $nextToWin = $this->loadNextToWinFromFile();
         $nextToWinUsed = false;
         $targetWinner = null;
         
-        // 30% chance to use someone from "Next to Win" list if available
-        if (!empty($nextToWin) && rand(1, 100) <= 30) {
-            // Only use "Next to Win" if the selected person is actually in the current players list
+        // Always check if any "Next to Win" names exist in the current players list
+        if (!empty($nextToWin)) {
             $availableNextToWin = [];
             foreach ($nextToWin as $nextToWinEntry) {
                 if (in_array($nextToWinEntry['name'], $players)) {
@@ -92,6 +91,7 @@ class GameController extends Controller
                 }
             }
             
+            // If any "Next to Win" names are in the players list, guarantee one of them wins
             if (!empty($availableNextToWin)) {
                 $nextToWinUsed = true;
                 $targetWinner = $availableNextToWin[rand(0, count($availableNextToWin) - 1)];
