@@ -22,7 +22,18 @@ RUN composer install --optimize-autoloader --no-dev --no-scripts
 COPY . .
 
 # Set up Laravel
-RUN php artisan key:generate --force \
+RUN echo 'APP_NAME="Roulette Game"' > .env \
+    && echo 'APP_ENV=production' >> .env \
+    && echo 'APP_KEY=' >> .env \
+    && echo 'APP_DEBUG=false' >> .env \
+    && echo 'APP_TIMEZONE=UTC' >> .env \
+    && echo 'APP_URL=http://localhost' >> .env \
+    && echo 'DB_CONNECTION=sqlite' >> .env \
+    && echo 'DB_DATABASE=/var/www/database/database.sqlite' >> .env \
+    && echo 'SESSION_DRIVER=database' >> .env \
+    && echo 'CACHE_STORE=database' >> .env \
+    && echo 'QUEUE_CONNECTION=database' >> .env \
+    && php artisan key:generate --force \
     && php artisan storage:link \
     && mkdir -p storage/framework/{cache,views,sessions} bootstrap/cache public/storage/save \
     && chmod -R 775 storage bootstrap/cache \
