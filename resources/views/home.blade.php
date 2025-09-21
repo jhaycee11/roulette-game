@@ -1734,7 +1734,7 @@
         }
         
         function showDebugInfo() {
-            // Get the Next to Win data from session
+            // Try to fetch from backend first, but have a fallback
             fetch('{{ route("admin.debug.next.to.win") }}', {
                 method: 'POST',
                 headers: {
@@ -1745,7 +1745,12 @@
                     players: players
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 let debugInfo = '=== DEBUG: Next to Win vs Player List ===\n\n';
                 
@@ -1796,8 +1801,69 @@
                 console.log('=== DEBUG: Next to Win vs Players ===', data);
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Error fetching debug information: ' + error.message);
+                console.error('Backend debug failed:', error);
+                
+                // Fallback: Show basic debug info without backend
+                showFallbackDebugInfo();
+            });
+        }
+        
+        // Fallback debug function that works without backend
+        function showFallbackDebugInfo() {
+            let debugInfo = '=== DEBUG: Current Game State ===\n\n';
+            
+            // Current players info
+            debugInfo += `📊 CURRENT GAME STATE:\n`;
+            debugInfo += `Players count: ${players.length}\n`;
+            debugInfo += `Is spinning: ${isSpinning}\n`;
+            debugInfo += `Spinning time: ${spinningTime} seconds\n\n`;
+            
+            if (players.length > 0) {
+                debugInfo += `=== CURRENT PLAYER LIST ===\n`;
+                players.forEach((player, index) => {
+                    debugInfo += `${index + 1}. "${player}"\n`;
+                });
+                debugInfo += '\n';
+            } else {
+                debugInfo += 'No players in current game.\n\n';
+            }
+            
+            // Textarea content
+            const textarea = document.getElementById('playersTextarea');
+            if (textarea) {
+                debugInfo += `=== TEXTAREA CONTENT ===\n`;
+                debugInfo += `Content length: ${textarea.value.length} characters\n`;
+                debugInfo += `Lines: ${textarea.value.split('\n').length}\n\n`;
+            }
+            
+            // Button states
+            const shuffleBtn = document.getElementById('shuffleBtn');
+            const wheelCenter = document.getElementById('wheelCenter');
+            debugInfo += `=== BUTTON STATES ===\n`;
+            debugInfo += `Shuffle button disabled: ${shuffleBtn ? shuffleBtn.disabled : 'Not found'}\n`;
+            debugInfo += `Wheel center disabled: ${wheelCenter ? wheelCenter.disabled : 'Not found'}\n\n`;
+            
+            // Environment info
+            debugInfo += `=== ENVIRONMENT INFO ===\n`;
+            debugInfo += `User Agent: ${navigator.userAgent}\n`;
+            debugInfo += `Current URL: ${window.location.href}\n`;
+            debugInfo += `Timestamp: ${new Date().toISOString()}\n\n`;
+            
+            debugInfo += '=== NOTE ===\n';
+            debugInfo += 'Backend debug unavailable. This is a fallback debug.\n';
+            debugInfo += 'For full Next to Win debug, check server logs.\n';
+            
+            // Show debug info
+            alert(debugInfo);
+            
+            // Also log to console
+            console.log('=== FALLBACK DEBUG INFO ===', {
+                players: players,
+                isSpinning: isSpinning,
+                spinningTime: spinningTime,
+                textareaContent: textarea ? textarea.value : 'Not found',
+                shuffleBtnDisabled: shuffleBtn ? shuffleBtn.disabled : 'Not found',
+                wheelCenterDisabled: wheelCenter ? wheelCenter.disabled : 'Not found'
             });
         }
         
