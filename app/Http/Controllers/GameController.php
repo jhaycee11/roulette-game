@@ -82,6 +82,13 @@ class GameController extends Controller
         $nextToWinUsed = false;
         $targetWinner = null;
         
+        // Debug logging
+        \Log::info('Next to Win Debug', [
+            'nextToWin' => $nextToWin,
+            'players' => $players,
+            'nextToWinCount' => count($nextToWin)
+        ]);
+        
         // Always check if any "Next to Win" names exist in the current players list
         if (!empty($nextToWin)) {
             $availableNextToWin = [];
@@ -91,10 +98,19 @@ class GameController extends Controller
                 }
             }
             
+            \Log::info('Next to Win Match Check', [
+                'availableNextToWin' => $availableNextToWin,
+                'availableCount' => count($availableNextToWin)
+            ]);
+            
             // If any "Next to Win" names are in the players list, guarantee one of them wins
             if (!empty($availableNextToWin)) {
                 $nextToWinUsed = true;
                 $targetWinner = $availableNextToWin[rand(0, count($availableNextToWin) - 1)];
+                \Log::info('Next to Win Used', [
+                    'targetWinner' => $targetWinner,
+                    'nextToWinUsed' => $nextToWinUsed
+                ]);
             }
         }
         

@@ -43,9 +43,24 @@ class AdminController extends Controller
         
         try {
             $jsonData = json_encode($nextToWin, JSON_PRETTY_PRINT);
-            File::put($filePath, $jsonData);
+            $result = File::put($filePath, $jsonData);
+            
+            // Verify the file was written successfully
+            if ($result === false) {
+                \Log::error('Failed to write Next to Win file', [
+                    'filePath' => $filePath,
+                    'directory' => $directory,
+                    'writable' => is_writable($directory)
+                ]);
+                return false;
+            }
+            
             return true;
         } catch (\Exception $e) {
+            \Log::error('Exception saving Next to Win file', [
+                'error' => $e->getMessage(),
+                'filePath' => $filePath
+            ]);
             return false;
         }
     }
@@ -128,10 +143,23 @@ class AdminController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
         
-        // Clear the JSON file
-        $this->saveNextToWinToFile([]);
-        
-        return response()->json(['message' => 'Next to Win list cleared successfully']);
+        try {
+            // Clear the JSON file
+            $success = $this->saveNextToWinToFile([]);
+            
+            if ($success) {
+                return response()->json(['message' => 'Next to Win list cleared successfully']);
+            } else {
+                return response()->json(['error' => 'Failed to clear Next to Win list. Check file permissions.'], 500);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error clearing Next to Win list', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json(['error' => 'An error occurred while clearing the Next to Win list: ' . $e->getMessage()], 500);
+        }
     }
     
     public function debugNextToWin(Request $request)
