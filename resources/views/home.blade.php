@@ -1734,136 +1734,114 @@
         }
         
         function showDebugInfo() {
-            // Try to fetch from backend first, but have a fallback
-            fetch('{{ route("admin.debug.next.to.win") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    players: players
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                let debugInfo = '=== DEBUG: Next to Win vs Player List ===\n\n';
-                
-                // Summary
-                debugInfo += `📊 SUMMARY:\n`;
-                debugInfo += `Next to Win entries: ${data.count}\n`;
-                debugInfo += `Current players: ${data.playerCount}\n`;
-                debugInfo += `Available in players: ${data.availableCount}\n`;
-                debugInfo += `NOT in players: ${data.notAvailableCount}\n\n`;
-                
-                if (data.nextToWin && data.nextToWin.length > 0) {
-                    debugInfo += `=== NEXT TO WIN LIST ===\n\n`;
-                    
-                    data.comparison.forEach((item) => {
-                        const status = item.is_in_players ? '✅ IN PLAYERS' : '❌ NOT IN PLAYERS';
-                        debugInfo += `${item.index}. "${item.name}" ${status}\n`;
-                        debugInfo += `   Added by: ${item.added_by}\n`;
-                        debugInfo += `   Added at: ${item.added_at}\n\n`;
-                    });
-                    
-                    if (data.availableInPlayers.length > 0) {
-                        debugInfo += `=== AVAILABLE IN PLAYERS ===\n`;
-                        debugInfo += data.availableInPlayers.join(', ') + '\n\n';
-                    }
-                    
-                    if (data.notInPlayers.length > 0) {
-                        debugInfo += `=== NOT IN PLAYERS ===\n`;
-                        debugInfo += data.notInPlayers.join(', ') + '\n\n';
-                    }
-                } else {
-                    debugInfo += 'No entries in Next to Win list.\n\n';
-                }
-                
-                if (data.players && data.players.length > 0) {
-                    debugInfo += `=== CURRENT PLAYER LIST ===\n`;
-                    debugInfo += data.players.join(', ') + '\n\n';
-                } else {
-                    debugInfo += 'No players in current game.\n\n';
-                }
-                
-                debugInfo += '=== Raw JSON Data ===\n';
-                debugInfo += JSON.stringify(data, null, 2);
-                
-                // Show in a modal-like alert
-                alert(debugInfo);
-                
-                // Also log to console for developers
-                console.log('=== DEBUG: Next to Win vs Players ===', data);
-            })
-            .catch(error => {
-                console.error('Backend debug failed:', error);
-                
-                // Fallback: Show basic debug info without backend
-                showFallbackDebugInfo();
-            });
+            // Use only client-side debug info (no backend calls)
+            showFallbackDebugInfo();
         }
         
-        // Fallback debug function that works without backend
+        // Comprehensive debug function that works without backend
         function showFallbackDebugInfo() {
-            let debugInfo = '=== DEBUG: Current Game State ===\n\n';
+            let debugInfo = '=== 🎯 ROULETTE GAME DEBUG INFO ===\n\n';
             
-            // Current players info
-            debugInfo += `📊 CURRENT GAME STATE:\n`;
-            debugInfo += `Players count: ${players.length}\n`;
-            debugInfo += `Is spinning: ${isSpinning}\n`;
-            debugInfo += `Spinning time: ${spinningTime} seconds\n\n`;
+            // Game state
+            debugInfo += `📊 GAME STATE:\n`;
+            debugInfo += `• Players count: ${players.length}\n`;
+            debugInfo += `• Is spinning: ${isSpinning}\n`;
+            debugInfo += `• Spinning time: ${spinningTime} seconds\n`;
+            debugInfo += `• Player list visible: ${playerListVisible}\n`;
+            debugInfo += `• Settings visible: ${settingsVisible}\n\n`;
             
+            // Players list
             if (players.length > 0) {
-                debugInfo += `=== CURRENT PLAYER LIST ===\n`;
+                debugInfo += `👥 CURRENT PLAYERS (${players.length}):\n`;
                 players.forEach((player, index) => {
-                    debugInfo += `${index + 1}. "${player}"\n`;
+                    debugInfo += `  ${index + 1}. "${player}"\n`;
                 });
                 debugInfo += '\n';
             } else {
-                debugInfo += 'No players in current game.\n\n';
+                debugInfo += '👥 No players in current game.\n\n';
             }
             
-            // Textarea content
+            // Textarea analysis
             const textarea = document.getElementById('playersTextarea');
             if (textarea) {
-                debugInfo += `=== TEXTAREA CONTENT ===\n`;
-                debugInfo += `Content length: ${textarea.value.length} characters\n`;
-                debugInfo += `Lines: ${textarea.value.split('\n').length}\n\n`;
+                const content = textarea.value;
+                const lines = content.split('\n');
+                const nonEmptyLines = lines.filter(line => line.trim().length > 0);
+                
+                debugInfo += `📝 TEXTAREA ANALYSIS:\n`;
+                debugInfo += `• Content length: ${content.length} characters\n`;
+                debugInfo += `• Total lines: ${lines.length}\n`;
+                debugInfo += `• Non-empty lines: ${nonEmptyLines.length}\n`;
+                debugInfo += `• First 3 lines: ${lines.slice(0, 3).map(line => `"${line}"`).join(', ')}\n\n`;
             }
             
-            // Button states
+            // UI Elements status
             const shuffleBtn = document.getElementById('shuffleBtn');
             const wheelCenter = document.getElementById('wheelCenter');
-            debugInfo += `=== BUTTON STATES ===\n`;
-            debugInfo += `Shuffle button disabled: ${shuffleBtn ? shuffleBtn.disabled : 'Not found'}\n`;
-            debugInfo += `Wheel center disabled: ${wheelCenter ? wheelCenter.disabled : 'Not found'}\n\n`;
+            const wheel = document.getElementById('rouletteWheel');
+            const settingsPanel = document.getElementById('settingsPanel');
             
-            // Environment info
-            debugInfo += `=== ENVIRONMENT INFO ===\n`;
-            debugInfo += `User Agent: ${navigator.userAgent}\n`;
-            debugInfo += `Current URL: ${window.location.href}\n`;
-            debugInfo += `Timestamp: ${new Date().toISOString()}\n\n`;
+            debugInfo += `🔘 UI ELEMENTS STATUS:\n`;
+            debugInfo += `• Shuffle button: ${shuffleBtn ? (shuffleBtn.disabled ? 'DISABLED' : 'ENABLED') : 'NOT FOUND'}\n`;
+            debugInfo += `• Wheel center: ${wheelCenter ? (wheelCenter.disabled ? 'DISABLED' : 'ENABLED') : 'NOT FOUND'}\n`;
+            debugInfo += `• Wheel spinning: ${wheel ? wheel.classList.contains('spinning') : 'NOT FOUND'}\n`;
+            debugInfo += `• Wheel slow-spin: ${wheel ? wheel.classList.contains('slow-spin') : 'NOT FOUND'}\n`;
+            debugInfo += `• Settings panel: ${settingsPanel ? (settingsPanel.classList.contains('show') ? 'VISIBLE' : 'HIDDEN') : 'NOT FOUND'}\n\n`;
             
-            debugInfo += '=== NOTE ===\n';
-            debugInfo += 'Backend debug unavailable. This is a fallback debug.\n';
-            debugInfo += 'For full Next to Win debug, check server logs.\n';
+            // Browser & Environment
+            debugInfo += `🌐 ENVIRONMENT:\n`;
+            debugInfo += `• URL: ${window.location.href}\n`;
+            debugInfo += `• User Agent: ${navigator.userAgent.substring(0, 100)}...\n`;
+            debugInfo += `• Screen: ${screen.width}x${screen.height}\n`;
+            debugInfo += `• Viewport: ${window.innerWidth}x${window.innerHeight}\n`;
+            debugInfo += `• Timestamp: ${new Date().toLocaleString()}\n\n`;
+            
+            // Performance info
+            debugInfo += `⚡ PERFORMANCE:\n`;
+            debugInfo += `• Memory usage: ${performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB' : 'N/A'}\n`;
+            debugInfo += `• Load time: ${Math.round(performance.now())}ms\n\n`;
+            
+            // Next to Win info (if available)
+            debugInfo += `🎯 NEXT TO WIN INFO:\n`;
+            debugInfo += `• Backend route: {{ route("admin.debug.next.to.win") }}\n`;
+            debugInfo += `• Note: Backend debug not available in production\n`;
+            debugInfo += `• Check server logs for Next to Win data\n\n`;
+            
+            debugInfo += `💡 TROUBLESHOOTING:\n`;
+            debugInfo += `• If shuffle button not working: Check if players >= 2\n`;
+            debugInfo += `• If wheel not spinning: Check if players exist\n`;
+            debugInfo += `• If settings not opening: Check for JavaScript errors\n`;
+            debugInfo += `• For Next to Win: Check server logs or admin panel\n`;
             
             // Show debug info
             alert(debugInfo);
             
-            // Also log to console
-            console.log('=== FALLBACK DEBUG INFO ===', {
-                players: players,
-                isSpinning: isSpinning,
-                spinningTime: spinningTime,
-                textareaContent: textarea ? textarea.value : 'Not found',
-                shuffleBtnDisabled: shuffleBtn ? shuffleBtn.disabled : 'Not found',
-                wheelCenterDisabled: wheelCenter ? wheelCenter.disabled : 'Not found'
+            // Enhanced console logging
+            console.log('=== 🎯 ROULETTE DEBUG INFO ===', {
+                gameState: {
+                    players: players,
+                    isSpinning: isSpinning,
+                    spinningTime: spinningTime,
+                    playerListVisible: playerListVisible,
+                    settingsVisible: settingsVisible
+                },
+                uiElements: {
+                    shuffleBtn: shuffleBtn ? { disabled: shuffleBtn.disabled, classes: shuffleBtn.className } : 'Not found',
+                    wheelCenter: wheelCenter ? { disabled: wheelCenter.disabled, classes: wheelCenter.className } : 'Not found',
+                    wheel: wheel ? { classes: wheel.className, spinning: wheel.classList.contains('spinning') } : 'Not found'
+                },
+                textarea: textarea ? {
+                    content: textarea.value,
+                    length: textarea.value.length,
+                    lines: textarea.value.split('\n').length
+                } : 'Not found',
+                environment: {
+                    url: window.location.href,
+                    userAgent: navigator.userAgent,
+                    screen: `${screen.width}x${screen.height}`,
+                    viewport: `${window.innerWidth}x${window.innerHeight}`,
+                    timestamp: new Date().toISOString()
+                }
             });
         }
         
