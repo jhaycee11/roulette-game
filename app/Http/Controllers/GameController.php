@@ -12,7 +12,8 @@ class GameController extends Controller
 {
     private function loadNextToWinFromFile()
     {
-        $filePath = public_path('storage/save/nexttowin.json');
+        // Use Laravel's storage directory (more reliable for deployments)
+        $filePath = storage_path('app/nexttowin.json');
         
         if (!File::exists($filePath)) {
             return [];
@@ -23,6 +24,10 @@ class GameController extends Controller
             $data = json_decode($content, true);
             return is_array($data) ? $data : [];
         } catch (\Exception $e) {
+            \Log::error('Error loading next-to-win file', [
+                'filePath' => $filePath,
+                'error' => $e->getMessage()
+            ]);
             return [];
         }
     }

@@ -11,11 +11,19 @@ class AdminController extends Controller
 {
     private function getJsonFilePath()
     {
-        $path = public_path('storage/save/nexttowin.json');
+        // Use Laravel's storage directory (more reliable for deployments)
+        $path = storage_path('app/nexttowin.json');
+        
+        // Ensure storage/app directory exists
+        if (!is_dir(dirname($path))) {
+            mkdir(dirname($path), 0755, true);
+        }
+        
         \Log::info('Next to Win file path', [
             'path' => $path,
-            'publicPath' => public_path(),
-            'storagePath' => storage_path()
+            'storagePath' => storage_path(),
+            'directoryExists' => is_dir(dirname($path)),
+            'isWritable' => is_writable(dirname($path))
         ]);
         return $path;
     }
