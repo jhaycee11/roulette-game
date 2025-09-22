@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\AdminController;
 
@@ -44,4 +45,13 @@ Route::get('/test-next-to-win', function() {
         'result' => $result,
         'message' => 'Test completed - check if JC is selected as winner'
     ]);
+});
+
+// Cache clearing route for deployment
+Route::get('/clear-all', function () {
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    Artisan::call('cache:clear');
+    return '✅ All caches cleared!';
 });
