@@ -12,9 +12,24 @@ class GameController extends Controller
 {
     private function loadNextToWinFromFile()
     {
-        // HTML List implementation - read from localStorage via JavaScript
-        // This method is kept for compatibility but will be overridden by frontend
-        return [];
+        // Read from the same JSON file that AdminController uses
+        $filePath = storage_path('app/nexttowin.json');
+        
+        if (!File::exists($filePath)) {
+            return [];
+        }
+        
+        try {
+            $content = File::get($filePath);
+            $data = json_decode($content, true);
+            return is_array($data) ? $data : [];
+        } catch (\Exception $e) {
+            \Log::error('Error loading Next to Win file in GameController', [
+                'error' => $e->getMessage(),
+                'filePath' => $filePath
+            ]);
+            return [];
+        }
     }
     
     /**

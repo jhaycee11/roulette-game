@@ -308,7 +308,8 @@
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'same-origin'
                 });
                 
                 if (response.ok) {
@@ -375,6 +376,7 @@
                         'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'same-origin',
                     body: JSON.stringify({
                         winner_name: newName
                     })
@@ -406,7 +408,8 @@
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'same-origin'
                 });
                 
                 if (response.ok) {
@@ -434,7 +437,8 @@
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'same-origin'
                 });
                 
                 if (response.ok) {
