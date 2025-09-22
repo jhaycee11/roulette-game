@@ -245,9 +245,9 @@
                     <!-- HTML List Management Section -->
                     <div class="mb-4">
                         <h5 class="mb-3">
-                            <i class="fas fa-star"></i> Next to Win List (HTML List)
+                            <i class="fas fa-star"></i> Next to Win List (Server-Side)
                         </h5>
-                        <p class="text-muted mb-3">Manage the list of names that should win next. This uses browser localStorage for reliable storage.</p>
+                        <p class="text-muted mb-3">Manage the list of names that should win next. This uses server-side storage and is accessible from any device/browser.</p>
                         
                         <!-- Add New Name Form -->
                         <form id="addForm" class="mb-3">
@@ -294,8 +294,35 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // HTML List Management
-        let nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
+        // Server-side List Management
+        let nextToWinList = [];
+        
+        // CSRF token for AJAX requests
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        // Load list from server
+        async function loadListFromServer() {
+            try {
+                const response = await fetch('/admin/next-to-win', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    nextToWinList = data.data || [];
+                    displayList();
+                } else {
+                    showMessage('Failed to load list from server', 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading list:', error);
+                showMessage('Error connecting to server', 'danger');
+            }
+        }
         
         // Display the list
         function displayList() {
@@ -311,11 +338,11 @@
                 emptyState.style.display = 'none';
                 clearAllBtn.style.display = 'inline-block';
                 
-                nameList.innerHTML = nextToWinList.map((name, index) => `
+                nameList.innerHTML = nextToWinList.map((item, index) => `
                     <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded">
                         <div>
-                            <strong>${name}</strong>
-                            <small class="text-muted d-block">Added: ${new Date().toLocaleDateString()}</small>
+                            <strong>${item.name}</strong>
+                            <small class="text-muted d-block">Added: ${item.added_at} by ${item.added_by}</small>
                         </div>
                         <button class="btn btn-sm btn-outline-danger" onclick="removeName(${index})">
                             <i class="fas fa-times"></i>
@@ -325,45 +352,107 @@
             }
         }
         
-        // Add new name
-        document.getElementById('addForm').addEventListener('submit', function(e) {
+        // Add new name to server
+        document.getElementById('addForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const newName = document.getElementById('newName').value.trim();
             
-            if (newName && !nextToWinList.includes(newName)) {
-                nextToWinList.push(newName);
-                localStorage.setItem('nextToWinList', JSON.stringify(nextToWinList));
-                document.getElementById('newName').value = '';
-                displayList();
-                showMessage('Name added successfully!', 'success');
-            } else if (nextToWinList.includes(newName)) {
+            if (!newName) {
+                showMessage('Please enter a name', 'warning');
+                return;
+            }
+            
+            // Check if name already exists
+            if (nextToWinList.some(item => item.name.toLowerCase() === newName.toLowerCase())) {
                 showMessage('This name is already in the list!', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/add-win', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        winner_name: newName
+                    })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('newName').value = '';
+                    await loadListFromServer(); // Reload from server
+                    showMessage('Name added successfully!', 'success');
+                } else {
+                    const error = await response.json();
+                    showMessage(error.message || 'Failed to add name', 'danger');
+                }
+            } catch (error) {
+                console.error('Error adding name:', error);
+                showMessage('Error connecting to server', 'danger');
             }
         });
         
-        // Remove name
-        function removeName(index) {
-            const removedName = nextToWinList[index];
-            nextToWinList.splice(index, 1);
-            localStorage.setItem('nextToWinList', JSON.stringify(nextToWinList));
-            displayList();
-            showMessage(`"${removedName}" removed from list`, 'info');
+        // Remove name from server
+        async function removeName(index) {
+            if (!confirm('Are you sure you want to remove this name?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/next-to-win/${index}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    await loadListFromServer(); // Reload from server
+                    showMessage('Name removed successfully!', 'info');
+                } else {
+                    const error = await response.json();
+                    showMessage(error.message || 'Failed to remove name', 'danger');
+                }
+            } catch (error) {
+                console.error('Error removing name:', error);
+                showMessage('Error connecting to server', 'danger');
+            }
         }
         
-        // Clear all names
-        document.getElementById('clearAllBtn').addEventListener('click', function() {
-            if (confirm('Are you sure you want to clear all names from the Next to Win list?')) {
-                nextToWinList = [];
-                localStorage.setItem('nextToWinList', JSON.stringify(nextToWinList));
-                displayList();
-                showMessage('All names cleared!', 'info');
+        // Clear all names from server
+        document.getElementById('clearAllBtn').addEventListener('click', async function() {
+            if (!confirm('Are you sure you want to clear all names from the Next to Win list?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/next-to-win/clear', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    await loadListFromServer(); // Reload from server
+                    showMessage('All names cleared!', 'info');
+                } else {
+                    const error = await response.json();
+                    showMessage(error.message || 'Failed to clear list', 'danger');
+                }
+            } catch (error) {
+                console.error('Error clearing list:', error);
+                showMessage('Error connecting to server', 'danger');
             }
         });
         
-        // Refresh list
-        function refreshList() {
-            nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
-            displayList();
+        // Refresh list from server
+        async function refreshList() {
+            await loadListFromServer();
             showMessage('List refreshed!', 'info');
         }
         
@@ -388,7 +477,7 @@
         }
         
         // Initialize display
-        displayList();
+        loadListFromServer();
     </script>
 </body>
 </html>

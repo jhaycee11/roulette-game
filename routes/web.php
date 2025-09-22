@@ -20,6 +20,8 @@ Route::post('/admin/logout', [AdminController::class, 'logout'])->name('admin.lo
 Route::middleware(['admin'])->group(function () {
     Route::post('/admin/add-win', [AdminController::class, 'addWin'])->name('admin.add.win');
     Route::delete('/admin/next-to-win/clear', [AdminController::class, 'clearNextToWin'])->name('admin.clear.next.to.win');
+    Route::get('/admin/next-to-win', [AdminController::class, 'getNextToWin'])->name('admin.get.next.to.win');
+    Route::delete('/admin/next-to-win/{index}', [AdminController::class, 'removeNextToWin'])->name('admin.remove.next.to.win');
 });
 
 // Debug route (accessible from home page)

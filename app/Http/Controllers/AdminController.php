@@ -300,4 +300,51 @@ class AdminController extends Controller
         ]);
     }
     
+    /**
+     * Remove a specific item from the next-to-win list by index
+     */
+    public function removeNextToWin($index)
+    {
+        if (!session('admin_authenticated')) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+        
+        try {
+            $nextToWin = $this->loadNextToWinFromFile();
+            
+            // Validate index
+            if (!isset($nextToWin[$index])) {
+                return response()->json(['error' => 'Item not found'], 404);
+            }
+            
+            // Remove the item
+            $removedItem = $nextToWin[$index];
+            unset($nextToWin[$index]);
+            
+            // Re-index the array
+            $nextToWin = array_values($nextToWin);
+            
+            // Save back to file
+            $success = $this->saveNextToWinToFile($nextToWin);
+            
+            if ($success) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Item removed successfully',
+                    'removedItem' => $removedItem,
+                    'remainingCount' => count($nextToWin)
+                ]);
+            } else {
+                return response()->json(['error' => 'Failed to save changes'], 500);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error removing Next to Win item', [
+                'error' => $e->getMessage(),
+                'index' => $index
+            ]);
+            
+            return response()->json(['error' => 'An error occurred while removing the item'], 500);
+        }
+    }
+    
 }
