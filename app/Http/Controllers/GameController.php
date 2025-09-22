@@ -5,25 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File;
 
 class GameController extends Controller
 {
-    private function loadNextToWinFromFile()
+    private function getNextToWinNames()
     {
-        $filePath = public_path('storage/save/nexttowin.json');
+        $config = config('nexttowin');
         
-        if (!File::exists($filePath)) {
+        // Check if Next to Win feature is enabled
+        if (!$config['enabled']) {
             return [];
         }
         
-        try {
-            $content = File::get($filePath);
-            $data = json_decode($content, true);
-            return is_array($data) ? $data : [];
-        } catch (\Exception $e) {
-            return [];
-        }
+        // Return the configured names
+        return $config['names'] ?? [];
     }
     public function index()
     {
@@ -78,16 +73,16 @@ class GameController extends Controller
         }
 
         // Check if there's a "Next to Win" list and if any names are in the current players list
-        $nextToWin = $this->loadNextToWinFromFile();
+        $nextToWinNames = $this->getNextToWinNames();
         $nextToWinUsed = false;
         $targetWinner = null;
         
         // Always check if any "Next to Win" names exist in the current players list
-        if (!empty($nextToWin)) {
+        if (!empty($nextToWinNames)) {
             $availableNextToWin = [];
-            foreach ($nextToWin as $nextToWinEntry) {
-                if (in_array($nextToWinEntry['name'], $players)) {
-                    $availableNextToWin[] = $nextToWinEntry['name'];
+            foreach ($nextToWinNames as $nextToWinName) {
+                if (in_array($nextToWinName, $players)) {
+                    $availableNextToWin[] = $nextToWinName;
                 }
             }
             

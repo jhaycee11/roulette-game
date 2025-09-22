@@ -1,6 +1,6 @@
 # Roulette Game Web Application
 
-A modern, interactive roulette game built with Laravel, featuring a beautiful animated wheel, player management, and admin dashboard.
+A modern, interactive roulette game built with Laravel, featuring a beautiful animated wheel and player management.
 
 ## Features
 
@@ -10,17 +10,11 @@ A modern, interactive roulette game built with Laravel, featuring a beautiful an
 - **Random Winner Selection**: Fair random selection with visual feedback
 - **Winner Announcement**: Celebratory winner display with confetti animation
 
-### 📊 Admin Dashboard
-- **Game Statistics**: Total games, unique winners, average players per game
-- **Recent Winners**: View latest game results
-- **Data Management**: Clear all winners functionality
-- **Secure Access**: Admin login with credentials
-
-### 🏆 Past Winners
-- **Winner History**: Complete list of all past winners
-- **Search & Filter**: Find winners by name
-- **Sorting Options**: Sort by name, winning number, or date
-- **Pagination**: Efficient browsing of large winner lists
+### 🎮 Game Features
+- **Player Management**: Add multiple players with name validation
+- **Random Selection**: Fair random winner selection
+- **Settings Panel**: Customize spinning time and game options
+- **Debug Tools**: Built-in debugging for troubleshooting
 
 ### 📱 Modern Design
 - **Responsive Layout**: Works perfectly on desktop, tablet, and mobile
@@ -67,23 +61,18 @@ A modern, interactive roulette game built with Laravel, featuring a beautiful an
 3. **Spin Wheel**: Click "Spin the Wheel" to start the animation
 4. **View Winner**: See the winner announcement with confetti celebration
 
-### Admin Access
+### Game Controls
 
-- **URL**: `/admin`
-- **Username**: `admin`
-- **Password**: `roulette2024`
-
-### Viewing Past Winners
-
-- **URL**: `/winners`
-- **Features**: Search, sort, and paginate through all past winners
+- **Settings**: Click the gear icon to adjust spinning time (1-60 seconds)
+- **Debug**: Click the bug icon to view game state and troubleshooting info
+- **Shuffle**: Randomize player order before spinning
 
 ## Technical Details
 
 ### Backend
 - **Framework**: Laravel 10+
 - **Database**: MySQL/PostgreSQL/SQLite
-- **Authentication**: Session-based admin authentication
+- **Authentication**: No authentication required
 - **Validation**: Server-side input validation and sanitization
 
 ### Frontend
@@ -110,31 +99,18 @@ A modern, interactive roulette game built with Laravel, featuring a beautiful an
 ```
 app/
 ├── Http/Controllers/
-│   ├── GameController.php      # Main game logic
-│   ├── WinnerController.php    # Past winners management
-│   └── AdminController.php     # Admin dashboard
-├── Models/
-│   └── Winner.php              # Winner model
+│   └── GameController.php      # Main game logic
 resources/views/
 ├── home.blade.php              # Home page with player input
 ├── game.blade.php              # Roulette wheel game page
-├── winners.blade.php           # Past winners listing
-└── admin/
-    ├── login.blade.php         # Admin login page
-    └── dashboard.blade.php     # Admin dashboard
+└── welcome.blade.php           # Welcome page
 ```
 
 ## API Endpoints
 
 - `GET /` - Home page
 - `POST /players` - Store player names
-- `GET /game` - Game page
 - `POST /spin` - Spin the wheel (AJAX)
-- `GET /winners` - Past winners page
-- `GET /admin` - Admin dashboard
-- `POST /admin/login` - Admin login
-- `POST /admin/logout` - Admin logout
-- `DELETE /admin/winners/clear` - Clear all winners
 
 ## Browser Support
 

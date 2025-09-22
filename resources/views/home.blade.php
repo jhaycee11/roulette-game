@@ -1803,15 +1803,14 @@
             
             // Next to Win info (if available)
             debugInfo += `🎯 NEXT TO WIN INFO:\n`;
-            debugInfo += `• Backend route: {{ route("admin.debug.next.to.win") }}\n`;
-            debugInfo += `• Note: Backend debug not available in production\n`;
-            debugInfo += `• Check server logs for Next to Win data\n\n`;
+            debugInfo += `• Note: Next to Win functionality has been removed\n`;
+            debugInfo += `• Game now uses standard random selection\n\n`;
             
             debugInfo += `💡 TROUBLESHOOTING:\n`;
             debugInfo += `• If shuffle button not working: Check if players >= 2\n`;
             debugInfo += `• If wheel not spinning: Check if players exist\n`;
             debugInfo += `• If settings not opening: Check for JavaScript errors\n`;
-            debugInfo += `• For Next to Win: Check server logs or admin panel\n`;
+            debugInfo += `• For game issues: Check browser console for errors\n`;
             
             // Show debug info
             alert(debugInfo);

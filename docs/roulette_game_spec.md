@@ -92,21 +92,17 @@ The application will be a modern roulette game where players can enter their nam
 
 ---
 
-### 4. Admin Section (Optional)
-**URL:** `/admin`
-
+### 4. Game Settings & Debug (Optional)
 **Features:**  
-**Admin Dashboard (for managing game data):**
-- Admin panel to manage game settings, such as maximum number of players.
-- View detailed game statistics like total games played, average number of players, etc.
+**Settings Panel:**
+- Adjust spinning time (1-60 seconds)
+- Customize game behavior
+- Visual feedback for settings changes
 
-**Manage Past Winners:**
-- Option to clear past winners if desired.
-
-**Back-End Tasks:**
-- Define an admin route (`/admin`).
-- Implement an authentication system for accessing the admin page (basic login with username/password).
-- Create a simple dashboard that shows relevant game statistics.
+**Debug Tools:**
+- Built-in debugging information
+- Game state inspection
+- Troubleshooting assistance
 
 ---
 
@@ -159,7 +155,7 @@ The application will be a modern roulette game where players can enter their nam
   - The page should load quickly, with minimal resource usage.
 - **Security:**
   - Ensure proper input sanitization to avoid security risks (e.g., XSS attacks on player names).
-  - If an admin panel is implemented, use Laravel Authentication to restrict access.
+  - Implement CSRF protection for all forms.
 - **Accessibility:**
   - Ensure all text and elements are readable and accessible (e.g., adequate contrast for colorblind users).
   - Include alternative text for images (wheel, buttons, etc.).
