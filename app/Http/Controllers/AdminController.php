@@ -80,10 +80,7 @@ class AdminController extends Controller
     }
     public function index()
     {
-        // Simple admin authentication check
-        if (!session('admin_authenticated')) {
-            return view('admin.login');
-        }
+        // No authentication required - direct access to dashboard
         
         $stats = [
             'total_games' => 0,
@@ -127,10 +124,6 @@ class AdminController extends Controller
     
     public function addWin(Request $request)
     {
-        if (!session('admin_authenticated')) {
-            return redirect()->route('admin');
-        }
-        
         $request->validate([
             'winner_name' => 'required|string|max:255'
         ]);
@@ -142,7 +135,7 @@ class AdminController extends Controller
         $nextToWin[] = [
             'name' => $request->winner_name,
             'added_at' => now()->format('M d, Y h:i A'),
-            'added_by' => session('admin_user', 'Admin')
+            'added_by' => 'Admin'
         ];
         
         // Save to JSON file
@@ -153,9 +146,6 @@ class AdminController extends Controller
     
     public function clearNextToWin()
     {
-        if (!session('admin_authenticated')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
         
         try {
             $filePath = $this->getJsonFilePath();
@@ -305,9 +295,6 @@ class AdminController extends Controller
      */
     public function removeNextToWin($index)
     {
-        if (!session('admin_authenticated')) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
         
         try {
             $nextToWin = $this->loadNextToWinFromFile();
