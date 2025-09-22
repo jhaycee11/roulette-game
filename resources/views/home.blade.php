@@ -1559,39 +1559,28 @@
             // Store winner data for later display
             let winnerData = null;
             
-            // Call backend to get winner (considering Next to Win logic)
-            fetch('{{ route("spin") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    players: players
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error('Error from backend:', data.error);
-                    // Fallback to frontend calculation
-                    winnerData = calculateWinnerFromPosition(finalRotation);
-                } else {
-                    // Use backend-determined winner
-                    console.log('Backend winner:', data.winner);
-                    console.log('Next to Win used:', data.next_to_win_used);
-                    console.log('Debug info:', data.debug_info);
-                    winnerData = {
-                        winner: data.winner,
-                        winnerNumber: data.winning_number
-                    };
-                }
-            })
-            .catch(error => {
-                console.error('Error calling backend:', error);
-                // Fallback to frontend calculation
+            // HTML List implementation - check localStorage for next-to-win
+            const nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
+            const availableNextToWin = nextToWinList.filter(name => players.includes(name));
+            
+            if (availableNextToWin.length > 0) {
+                // Select random winner from next-to-win list
+                const selectedWinner = availableNextToWin[Math.floor(Math.random() * availableNextToWin.length)];
+                const winnerIndex = players.indexOf(selectedWinner);
+                
+                console.log('Next to Win used:', true);
+                console.log('Available next-to-win:', availableNextToWin);
+                console.log('Selected winner:', selectedWinner);
+                
+                winnerData = {
+                    winner: selectedWinner,
+                    winnerNumber: winnerIndex
+                };
+            } else {
+                // Normal random selection
+                console.log('Next to Win used:', false);
                 winnerData = calculateWinnerFromPosition(finalRotation);
-            });
+            }
             
             // Show winner after animation completes (use custom spinning time)
             setTimeout(() => {
@@ -1735,76 +1724,76 @@
         }
         
         function showDebugInfo() {
-            // Try backend first, fallback to client-side if it fails
-            fetch('{{ route("admin.debug.next.to.win") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    players: players
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                let debugInfo = '=== 🎯 NEXT TO WIN DEBUG INFO ===\n\n';
-                
-                // Summary
-                debugInfo += `📊 SUMMARY:\n`;
-                debugInfo += `• Next to Win entries: ${data.count}\n`;
-                debugInfo += `• Current players: ${data.playerCount}\n`;
-                debugInfo += `• Available in players: ${data.availableCount}\n`;
-                debugInfo += `• NOT in players: ${data.notAvailableCount}\n\n`;
-                
-                if (data.nextToWin && data.nextToWin.length > 0) {
-                    debugInfo += `=== NEXT TO WIN LIST ===\n\n`;
-                    
-                    data.comparison.forEach((item) => {
-                        const status = item.is_in_players ? '✅ IN PLAYERS' : '❌ NOT IN PLAYERS';
-                        debugInfo += `${item.index}. "${item.name}" ${status}\n`;
-                        debugInfo += `   Added by: ${item.added_by}\n`;
-                        debugInfo += `   Added at: ${item.added_at}\n\n`;
-                    });
-                    
-                    if (data.availableInPlayers.length > 0) {
-                        debugInfo += `=== AVAILABLE IN PLAYERS ===\n`;
-                        debugInfo += data.availableInPlayers.join(', ') + '\n\n';
-                    }
-                    
-                    if (data.notInPlayers.length > 0) {
-                        debugInfo += `=== NOT IN PLAYERS ===\n`;
-                        debugInfo += data.notInPlayers.join(', ') + '\n\n';
-                    }
+            // HTML List implementation - read from localStorage
+            const nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
+            
+            let debugInfo = '=== 🎯 NEXT TO WIN DEBUG INFO (HTML LIST) ===\n\n';
+            
+            // Summary
+            debugInfo += `📊 SUMMARY:\n`;
+            debugInfo += `• Next to Win entries: ${nextToWinList.length}\n`;
+            debugInfo += `• Current players: ${players.length}\n`;
+            
+            // Check which next-to-win names are in current players
+            const availableInPlayers = [];
+            const notInPlayers = [];
+            
+            nextToWinList.forEach(name => {
+                if (players.includes(name)) {
+                    availableInPlayers.push(name);
                 } else {
-                    debugInfo += 'No entries in Next to Win list.\n\n';
+                    notInPlayers.push(name);
+                }
+            });
+            
+            debugInfo += `• Available in players: ${availableInPlayers.length}\n`;
+            debugInfo += `• NOT in players: ${notInPlayers.length}\n\n`;
+            
+            if (nextToWinList.length > 0) {
+                debugInfo += `=== NEXT TO WIN LIST ===\n\n`;
+                
+                nextToWinList.forEach((name, index) => {
+                    const isInPlayers = players.includes(name);
+                    const status = isInPlayers ? '✅ IN PLAYERS' : '❌ NOT IN PLAYERS';
+                    debugInfo += `${index + 1}. "${name}" ${status}\n`;
+                });
+                
+                if (availableInPlayers.length > 0) {
+                    debugInfo += `\n=== AVAILABLE IN PLAYERS ===\n`;
+                    debugInfo += availableInPlayers.join(', ') + '\n\n';
                 }
                 
-                if (data.players && data.players.length > 0) {
-                    debugInfo += `=== CURRENT PLAYER LIST ===\n`;
-                    debugInfo += data.players.join(', ') + '\n\n';
-                } else {
-                    debugInfo += 'No players in current game.\n\n';
+                if (notInPlayers.length > 0) {
+                    debugInfo += `=== NOT IN PLAYERS ===\n`;
+                    debugInfo += notInPlayers.join(', ') + '\n\n';
                 }
-                
-                debugInfo += '=== Raw JSON Data ===\n';
-                debugInfo += JSON.stringify(data, null, 2);
-                
-                // Show debug info
-                alert(debugInfo);
-                
-                // Also log to console
-                console.log('=== NEXT TO WIN DEBUG ===', data);
-            })
-            .catch(error => {
-                console.error('Backend debug failed:', error);
-                // Fallback to client-side debug
-                showFallbackDebugInfo();
+            } else {
+                debugInfo += 'No entries in Next to Win list.\n\n';
+            }
+            
+            if (players.length > 0) {
+                debugInfo += `=== CURRENT PLAYER LIST ===\n`;
+                debugInfo += players.join(', ') + '\n\n';
+            } else {
+                debugInfo += 'No players in current game.\n\n';
+            }
+            
+            debugInfo += `=== STORAGE INFO ===\n`;
+            debugInfo += `• Storage type: localStorage\n`;
+            debugInfo += `• Data source: HTML List Management\n`;
+            debugInfo += `• Raw data: ${JSON.stringify(nextToWinList)}\n\n`;
+            
+            debugInfo += `💡 TIP: Manage the Next to Win list at /next-to-win-list\n`;
+            
+            // Show debug info
+            alert(debugInfo);
+            
+            // Also log to console
+            console.log('=== NEXT TO WIN DEBUG (HTML LIST) ===', {
+                nextToWinList: nextToWinList,
+                players: players,
+                availableInPlayers: availableInPlayers,
+                notInPlayers: notInPlayers
             });
         }
         

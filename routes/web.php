@@ -55,3 +55,4 @@ Route::get('/clear-all', function () {
     Artisan::call('cache:clear');
     return '✅ All caches cleared!';
 });
+

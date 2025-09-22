@@ -311,30 +311,50 @@
                         <i class="fas fa-cog"></i> Admin Actions
                     </h4>
                     
-                    <!-- Add to Win List Section -->
+                    <!-- HTML List Management Section -->
                     <div class="mb-4">
                         <h5 class="mb-3">
-                            <i class="fas fa-plus-circle"></i> Add to Win List
+                            <i class="fas fa-star"></i> Next to Win List (HTML List)
                         </h5>
-                        <form method="POST" action="{{ route('admin.add.win') }}" id="addWinForm">
-                            @csrf
-                            <div class="mb-3">
-                                <input type="text" 
-                                       class="form-control" 
-                                       name="winner_name" 
-                                       placeholder="Enter winner name" 
-                                       required>
+                        <p class="text-muted mb-3">Manage the list of names that should win next. This uses browser localStorage for reliable storage.</p>
+                        
+                        <!-- Add New Name Form -->
+                        <form id="addForm" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" 
+                                           id="newName" 
+                                           class="form-control" 
+                                           placeholder="Enter name to add to Next to Win list"
+                                           required>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        <i class="fas fa-plus"></i> Add to List
+                                    </button>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-success w-100">
-                                <i class="fas fa-plus"></i> Add Next to Win
-                            </button>
                         </form>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-warning" onclick="clearNextToWin()">
-                            <i class="fas fa-star"></i> Clear Next to Win List
-                        </button>
+
+                        <!-- List Display -->
+                        <div id="listContainer">
+                            <div id="emptyState" class="text-center text-muted py-3" style="display: none;">
+                                <i class="fas fa-list fa-2x mb-2"></i>
+                                <p class="mb-0">No names in Next to Win list</p>
+                                <small>Add some names above to get started</small>
+                            </div>
+                            <div id="nameList"></div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="mt-3">
+                            <button id="clearAllBtn" class="btn btn-outline-danger me-2" style="display: none;">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                            <button class="btn btn-outline-info" onclick="refreshList()">
+                                <i class="fas fa-sync"></i> Refresh
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -343,31 +363,101 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function clearNextToWin() {
-            if (confirm('Are you sure you want to clear the Next to Win list? This action cannot be undone.')) {
-                fetch('{{ route("admin.clear.next.to.win") }}', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message) {
-                        alert(data.message);
-                        location.reload();
-                    } else if (data.error) {
-                        alert(data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while clearing the Next to Win list.');
-                });
+        // HTML List Management
+        let nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
+        
+        // Display the list
+        function displayList() {
+            const nameList = document.getElementById('nameList');
+            const emptyState = document.getElementById('emptyState');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+            
+            if (nextToWinList.length === 0) {
+                nameList.innerHTML = '';
+                emptyState.style.display = 'block';
+                clearAllBtn.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                clearAllBtn.style.display = 'inline-block';
+                
+                nameList.innerHTML = nextToWinList.map((name, index) => `
+                    <div class="d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded">
+                        <div>
+                            <strong>${name}</strong>
+                            <small class="text-muted d-block">Added: ${new Date().toLocaleDateString()}</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeName(${index})">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
             }
         }
         
+        // Add new name
+        document.getElementById('addForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newName = document.getElementById('newName').value.trim();
+            
+            if (newName && !nextToWinList.includes(newName)) {
+                nextToWinList.push(newName);
+                localStorage.setItem('nextToWinList', JSON.stringify(nextToWinList));
+                document.getElementById('newName').value = '';
+                displayList();
+                showMessage('Name added successfully!', 'success');
+            } else if (nextToWinList.includes(newName)) {
+                showMessage('This name is already in the list!', 'warning');
+            }
+        });
+        
+        // Remove name
+        function removeName(index) {
+            const removedName = nextToWinList[index];
+            nextToWinList.splice(index, 1);
+            localStorage.setItem('nextToWinList', JSON.stringify(nextToWinList));
+            displayList();
+            showMessage(`"${removedName}" removed from list`, 'info');
+        }
+        
+        // Clear all names
+        document.getElementById('clearAllBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all names from the Next to Win list?')) {
+                nextToWinList = [];
+                localStorage.setItem('nextToWinList', JSON.stringify(nextToWinList));
+                displayList();
+                showMessage('All names cleared!', 'info');
+            }
+        });
+        
+        // Refresh list
+        function refreshList() {
+            nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
+            displayList();
+            showMessage('List refreshed!', 'info');
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const container = document.querySelector('.recent-winners-card');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
+        }
+        
+        // Initialize display
+        displayList();
     </script>
 </body>
 </html>
