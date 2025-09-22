@@ -124,27 +124,6 @@
             transform: scale(1.1);
         }
         
-        .debug-btn {
-            position: fixed;
-            top: 20px;
-            left: 80px;
-            background: #17a2b8;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 1000;
-        }
-        
-        .debug-btn:hover {
-            background: #138496;
-            transform: scale(1.1);
-        }
         
         .settings-panel {
             position: fixed;
@@ -353,6 +332,46 @@
         .player-input-area textarea::placeholder {
             color: #6c757d;
             font-style: italic;
+        }
+        
+        .player-count-display {
+            background: rgba(108, 117, 125, 0.1);
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .player-count-display.has-players {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+        
+        .player-count-display.insufficient {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+        
+        .player-count-display.limit-reached {
+            background: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+        
+        .player-input-area textarea.limit-reached {
+            border-color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+        
+        .player-input-area textarea.limit-reached:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
         }
         
         .wheel-container {
@@ -852,13 +871,6 @@
                 font-size: 1rem;
             }
             
-            .debug-btn {
-                top: 15px;
-                left: 65px;
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
             
             .settings-panel {
                 top: 60px;
@@ -939,10 +951,6 @@
             <i class="fas fa-cog"></i>
         </button>
         
-        <!-- Debug Button -->
-        <button class="debug-btn" id="debugBtn" onclick="showDebugInfo()">
-            <i class="fas fa-bug"></i>
-        </button>
         
         <!-- Settings Panel -->
         <div class="settings-panel" id="settingsPanel">
@@ -994,6 +1002,9 @@
                     placeholder="Enter player names"
                     style="resize: vertical; min-height: 300px; overflow-y: auto;"
                 ></textarea>
+                <div class="player-count-display" id="playerCountDisplay">
+                    <i class="fas fa-users"></i> <span id="playerCount">0</span> / 1,000 players
+                </div>
             </div>
         </div>
         
@@ -1151,6 +1162,46 @@
         // Debounce timer for auto-updating
         let updateTimeout;
         
+        // Check if input should be restricted due to player limit
+        function shouldRestrictInput() {
+            const textarea = document.getElementById('playersTextarea');
+            const currentText = textarea.value.trim();
+            
+            if (!currentText) return false;
+            
+            const currentPlayers = currentText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+            
+            return currentPlayers.length >= 1000;
+        }
+
+        // Update player count display
+        function updatePlayerCountDisplay(playerCount) {
+            const countDisplay = document.getElementById('playerCountDisplay');
+            const countText = document.getElementById('playerCount');
+            const textarea = document.getElementById('playersTextarea');
+            
+            if (!countDisplay || !countText) return;
+            
+            countText.textContent = playerCount;
+            
+            // Update styling based on player count
+            countDisplay.classList.remove('has-players', 'insufficient', 'limit-reached');
+            textarea.classList.remove('limit-reached');
+            
+            if (playerCount === 0) {
+                // No players - default styling
+            } else if (playerCount >= 1000) {
+                countDisplay.classList.add('limit-reached');
+                textarea.classList.add('limit-reached');
+            } else if (playerCount < 2) {
+                countDisplay.classList.add('insufficient');
+            } else {
+                countDisplay.classList.add('has-players');
+            }
+        }
+
         // Auto-update players from textarea
         function autoUpdatePlayers() {
             const textarea = document.getElementById('playersTextarea');
@@ -1164,6 +1215,7 @@
                 if (!playerNames) {
                     // Clear players if textarea is empty
                     players = [];
+                    updatePlayerCountDisplay(0);
                     updateRouletteWheel();
                     hideGameControls();
                     
@@ -1174,9 +1226,20 @@
                 }
                 
                 // Parse player names from textarea (split by newlines and filter empty lines)
-                const newPlayers = playerNames.split('\n')
+                const allPlayers = playerNames.split('\n')
                     .map(name => name.trim())
                     .filter(name => name.length > 0);
+                
+                // Enforce 1,000 player limit
+                const newPlayers = allPlayers.slice(0, 1000);
+                
+                // If we had to truncate, update the textarea
+                if (allPlayers.length > 1000) {
+                    textarea.value = newPlayers.join('\n');
+                }
+                
+                // Update player count display
+                updatePlayerCountDisplay(newPlayers.length);
                 
                 if (newPlayers.length < 2) {
                     // Don't show game controls if less than 2 players
@@ -1274,6 +1337,9 @@
                 
                 // Update the roulette wheel with new order
                 updateRouletteWheel();
+                
+                // Update player count display (count should remain the same)
+                updatePlayerCountDisplay(players.length);
                 
                 // Show visual feedback
                 const shuffleBtn = document.getElementById('shuffleBtn');
@@ -1723,79 +1789,6 @@
             }
         }
         
-        function showDebugInfo() {
-            // HTML List implementation - read from localStorage
-            const nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
-            
-            let debugInfo = '=== 🎯 NEXT TO WIN DEBUG INFO (HTML LIST) ===\n\n';
-            
-            // Summary
-            debugInfo += `📊 SUMMARY:\n`;
-            debugInfo += `• Next to Win entries: ${nextToWinList.length}\n`;
-            debugInfo += `• Current players: ${players.length}\n`;
-            
-            // Check which next-to-win names are in current players
-            const availableInPlayers = [];
-            const notInPlayers = [];
-            
-            nextToWinList.forEach(name => {
-                if (players.includes(name)) {
-                    availableInPlayers.push(name);
-                } else {
-                    notInPlayers.push(name);
-                }
-            });
-            
-            debugInfo += `• Available in players: ${availableInPlayers.length}\n`;
-            debugInfo += `• NOT in players: ${notInPlayers.length}\n\n`;
-            
-            if (nextToWinList.length > 0) {
-                debugInfo += `=== NEXT TO WIN LIST ===\n\n`;
-                
-                nextToWinList.forEach((name, index) => {
-                    const isInPlayers = players.includes(name);
-                    const status = isInPlayers ? '✅ IN PLAYERS' : '❌ NOT IN PLAYERS';
-                    debugInfo += `${index + 1}. "${name}" ${status}\n`;
-                });
-                
-                if (availableInPlayers.length > 0) {
-                    debugInfo += `\n=== AVAILABLE IN PLAYERS ===\n`;
-                    debugInfo += availableInPlayers.join(', ') + '\n\n';
-                }
-                
-                if (notInPlayers.length > 0) {
-                    debugInfo += `=== NOT IN PLAYERS ===\n`;
-                    debugInfo += notInPlayers.join(', ') + '\n\n';
-                }
-            } else {
-                debugInfo += 'No entries in Next to Win list.\n\n';
-            }
-            
-            if (players.length > 0) {
-                debugInfo += `=== CURRENT PLAYER LIST ===\n`;
-                debugInfo += players.join(', ') + '\n\n';
-            } else {
-                debugInfo += 'No players in current game.\n\n';
-            }
-            
-            debugInfo += `=== STORAGE INFO ===\n`;
-            debugInfo += `• Storage type: localStorage\n`;
-            debugInfo += `• Data source: HTML List Management\n`;
-            debugInfo += `• Raw data: ${JSON.stringify(nextToWinList)}\n\n`;
-            
-            debugInfo += `💡 TIP: Manage the Next to Win list at /next-to-win-list\n`;
-            
-            // Show debug info
-            alert(debugInfo);
-            
-            // Also log to console
-            console.log('=== NEXT TO WIN DEBUG (HTML LIST) ===', {
-                nextToWinList: nextToWinList,
-                players: players,
-                availableInPlayers: availableInPlayers,
-                notInPlayers: notInPlayers
-            });
-        }
         
         // Comprehensive debug function that works without backend
         function showFallbackDebugInfo() {
@@ -1918,6 +1911,24 @@
                 setTimeout(autoUpdatePlayers, 10);
             });
             
+            // Prevent input when player limit is reached
+            playersTextarea.addEventListener('keydown', function(e) {
+                // Allow backspace, delete, arrow keys, and other navigation keys
+                const allowedKeys = [
+                    'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                    'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Enter'
+                ];
+                
+                if (allowedKeys.includes(e.key)) {
+                    return; // Allow these keys
+                }
+                
+                // Check if we're at the limit
+                if (shouldRestrictInput()) {
+                    e.preventDefault();
+                }
+            });
+            
             // Settings event listeners
             const spinningTimeInput = document.getElementById('spinningTimeInput');
             const spinningTimeSlider = document.getElementById('spinningTimeSlider');
@@ -1996,6 +2007,7 @@
             
             // Initialize with empty player list and show empty wheel
             players = [];
+            updatePlayerCountDisplay(0);
             updateRouletteWheel();
             hideGameControls();
             
