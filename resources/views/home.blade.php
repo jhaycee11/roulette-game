@@ -124,32 +124,6 @@
             transform: scale(1.1);
         }
         
-        .custom-winner-btn {
-            position: fixed;
-            top: 20px;
-            left: 70px;
-            background: #ffc107;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
-        }
-        
-        .custom-winner-btn:hover {
-            background: #e0a800;
-            transform: scale(1.1);
-            color: white;
-            text-decoration: none;
-        }
         
         .settings-panel {
             position: fixed;
@@ -897,13 +871,6 @@
                 font-size: 1rem;
             }
             
-            .custom-winner-btn {
-                top: 15px;
-                left: 60px;
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
             
             .settings-panel {
                 top: 60px;
@@ -984,10 +951,6 @@
             <i class="fas fa-cog"></i>
         </button>
         
-        <!-- Custom Winner Button -->
-        <a href="{{ route('custom-winner.index') }}" class="custom-winner-btn" title="Set Custom Winner">
-            <i class="fas fa-crown"></i>
-        </a>
         
         
         <!-- Settings Panel -->
@@ -1663,9 +1626,6 @@
             // Check for custom winner via API and show winner after animation completes
             setTimeout(async () => {
                 try {
-                    // Show loading state for custom winner check
-                    centerIcon.className = 'fas fa-crown fa-pulse';
-                    
                     // Call custom winner API to get latest settings
                     const customWinnerResponse = await fetch('/api/custom-winner');
                     const customWinnerData = await customWinnerResponse.json();
