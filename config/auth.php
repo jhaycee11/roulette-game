@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'static' => [
+            'driver' => 'static',
+            'provider' => 'static_users',
+        ],
     ],
 
     /*
@@ -63,6 +67,10 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+        'static_users' => [
+            'driver' => 'static',
+            'model' => App\Models\StaticUser::class,
         ],
 
         // 'users' => [

@@ -224,7 +224,18 @@
     <div class="main-container">
         <div class="settings-card">
             <div class="header">
-                <h1><i class="fas fa-crown"></i> Custom Winner</h1>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1><i class="fas fa-crown"></i> Custom Winner</h1>
+                    <div>
+                        <span class="text-muted me-3">Welcome, {{ Auth::guard('static')->user()->name }}!</span>
+                        <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-sign-out-alt me-1"></i>Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
                 <div class="subtitle">Set a guaranteed winner for the roulette game</div>
             </div>
             

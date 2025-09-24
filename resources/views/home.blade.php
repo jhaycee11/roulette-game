@@ -1013,7 +1013,12 @@
         <div class="game-section">
             <div class="game-content">
                 <div class="game-title">
-                    <h1><i class="fas fa-dice"></i> Roulette Game</h1>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1><i class="fas fa-dice"></i> Roulette Game</h1>
+                        <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-cog me-1"></i>Admin
+                        </a>
+                    </div>
                 </div>
                 
                 
