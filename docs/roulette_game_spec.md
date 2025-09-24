@@ -92,23 +92,6 @@ The application will be a modern roulette game where players can enter their nam
 
 ---
 
-### 4. Admin Section (Optional)
-**URL:** `/admin`
-
-**Features:**  
-**Admin Dashboard (for managing game data):**
-- Admin panel to manage game settings, such as maximum number of players.
-- View detailed game statistics like total games played, average number of players, etc.
-
-**Manage Past Winners:**
-- Option to clear past winners if desired.
-
-**Back-End Tasks:**
-- Define an admin route (`/admin`).
-- Implement an authentication system for accessing the admin page (basic login with username/password).
-- Create a simple dashboard that shows relevant game statistics.
-
----
 
 ## Core Features
 1. **Roulette Wheel Animation**
@@ -157,9 +140,8 @@ The application will be a modern roulette game where players can enter their nam
 - **Performance:**
   - Ensure the game runs smoothly and the wheel animation does not lag.
   - The page should load quickly, with minimal resource usage.
-- **Security:**
+  - **Security:**
   - Ensure proper input sanitization to avoid security risks (e.g., XSS attacks on player names).
-  - If an admin panel is implemented, use Laravel Authentication to restrict access.
 - **Accessibility:**
   - Ensure all text and elements are readable and accessible (e.g., adequate contrast for colorblind users).
   - Include alternative text for images (wheel, buttons, etc.).

@@ -124,6 +124,32 @@
             transform: scale(1.1);
         }
         
+        .custom-winner-btn {
+            position: fixed;
+            top: 20px;
+            left: 70px;
+            background: #ffc107;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+        
+        .custom-winner-btn:hover {
+            background: #e0a800;
+            transform: scale(1.1);
+            color: white;
+            text-decoration: none;
+        }
         
         .settings-panel {
             position: fixed;
@@ -871,6 +897,13 @@
                 font-size: 1rem;
             }
             
+            .custom-winner-btn {
+                top: 15px;
+                left: 60px;
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
             
             .settings-panel {
                 top: 60px;
@@ -950,6 +983,11 @@
         <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()">
             <i class="fas fa-cog"></i>
         </button>
+        
+        <!-- Custom Winner Button -->
+        <a href="{{ route('custom-winner.index') }}" class="custom-winner-btn" title="Set Custom Winner">
+            <i class="fas fa-crown"></i>
+        </a>
         
         
         <!-- Settings Panel -->
@@ -1622,41 +1660,10 @@
                 wheel.classList.add('blur-effect');
             }
             
-            // Store winner data for later display
-            let winnerData = null;
-            
-            // HTML List implementation - check localStorage for next-to-win
-            const nextToWinList = JSON.parse(localStorage.getItem('nextToWinList') || '[]');
-            const availableNextToWin = nextToWinList.filter(name => players.includes(name));
-            
-            if (availableNextToWin.length > 0) {
-                // Select random winner from next-to-win list
-                const selectedWinner = availableNextToWin[Math.floor(Math.random() * availableNextToWin.length)];
-                const winnerIndex = players.indexOf(selectedWinner);
-                
-                console.log('Next to Win used:', true);
-                console.log('Available next-to-win:', availableNextToWin);
-                console.log('Selected winner:', selectedWinner);
-                
-                winnerData = {
-                    winner: selectedWinner,
-                    winnerNumber: winnerIndex
-                };
-            } else {
-                // Normal random selection
-                console.log('Next to Win used:', false);
-                winnerData = calculateWinnerFromPosition(finalRotation);
-            }
-            
             // Show winner after animation completes (use custom spinning time)
             setTimeout(() => {
-                if (winnerData) {
-                    showWinner(winnerData.winner, winnerData.winnerNumber);
-                } else {
-                    // Final fallback
-                    const actualWinner = calculateWinnerFromPosition(finalRotation);
-                    showWinner(actualWinner.winner, actualWinner.winnerNumber);
-                }
+                const actualWinner = calculateWinnerFromPosition(finalRotation);
+                showWinner(actualWinner.winner, actualWinner.winnerNumber);
                 createConfetti();
             }, spinningTime * 1000);
         }
@@ -1853,17 +1860,10 @@
             debugInfo += `• Memory usage: ${performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB' : 'N/A'}\n`;
             debugInfo += `• Load time: ${Math.round(performance.now())}ms\n\n`;
             
-            // Next to Win info (if available)
-            debugInfo += `🎯 NEXT TO WIN INFO:\n`;
-            debugInfo += `• Backend route: {{ route("admin.debug.next.to.win") }}\n`;
-            debugInfo += `• Note: Backend debug not available in production\n`;
-            debugInfo += `• Check server logs for Next to Win data\n\n`;
-            
             debugInfo += `💡 TROUBLESHOOTING:\n`;
             debugInfo += `• If shuffle button not working: Check if players >= 2\n`;
             debugInfo += `• If wheel not spinning: Check if players exist\n`;
             debugInfo += `• If settings not opening: Check for JavaScript errors\n`;
-            debugInfo += `• For Next to Win: Check server logs or admin panel\n`;
             
             // Show debug info
             alert(debugInfo);
