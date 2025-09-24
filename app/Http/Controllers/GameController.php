@@ -63,23 +63,20 @@ class GameController extends Controller
             return response()->json(['error' => 'No players found'], 400);
         }
 
-        // Check for custom winner
-        $customWinner = $this->checkCustomWinner($players);
-        
         // Create wheel sections (shuffle for visual randomness)
         $wheelSections = $players;
         shuffle($wheelSections);
         
-        if ($customWinner['has_custom_winner']) {
-            // Custom winner is guaranteed to win
-            $winner = $customWinner['winner_name'];
-            $winningSection = array_search($winner, $players);
-            
-            // Ensure custom winner appears in the wheel for visual consistency
-            if (!in_array($winner, $wheelSections)) {
-                // Replace a random position with the custom winner
-                $wheelSections[rand(0, count($players) - 1)] = $winner;
-            }
+        // Check for custom winner
+        $customWinnerName = config('customwinner.winner_name', '');
+        
+        $winner = null;
+        $winningSection = null;
+        
+        // If custom winner name is set and in the players list, use it
+        if (!empty($customWinnerName) && in_array($customWinnerName, $players)) {
+            $winner = $customWinnerName;
+            $winningSection = array_search($customWinnerName, $wheelSections);
         } else {
             // Random selection from current players
             $winningSection = rand(0, count($players) - 1);
@@ -89,30 +86,8 @@ class GameController extends Controller
         return response()->json([
             'winner' => $winner,
             'winning_number' => $winningSection,
-            'wheel_sections' => $wheelSections,
-            'custom_winner_used' => $customWinner['has_custom_winner'],
-            'custom_winner_name' => $customWinner['winner_name']
+            'wheel_sections' => $wheelSections
         ]);
     }
     
-    private function checkCustomWinner($players)
-    {
-        $customWinnerName = config('customwinner.winner_name', '');
-        $customWinnerEnabled = config('customwinner.enabled', false);
-        
-        $hasCustomWinner = false;
-        
-        if ($customWinnerEnabled && !empty($customWinnerName)) {
-            // Check if the custom winner name is in the players list
-            if (in_array($customWinnerName, $players)) {
-                $hasCustomWinner = true;
-            }
-        }
-        
-        return [
-            'has_custom_winner' => $hasCustomWinner,
-            'winner_name' => $customWinnerName,
-            'enabled' => $customWinnerEnabled
-        ];
-    }
 }

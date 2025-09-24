@@ -252,11 +252,7 @@
                     @endif
                 </p>
                 <p><strong>Status:</strong> 
-                    @if($customWinner['enabled'])
-                        <span class="status-badge status-enabled">Enabled</span>
-                    @else
-                        <span class="status-badge status-disabled">Disabled</span>
-                    @endif
+                    <span class="status-badge status-enabled">Always Enabled</span>
                 </p>
             </div>
             
@@ -265,7 +261,7 @@
                 <p>• Set a name that will win 100% of the time when present in the player list</p>
                 <p>• If the custom winner is not in the player list, the game will be random</p>
                 <p>• You can change the winner name anytime without restarting the game</p>
-                <p>• Enable/disable the feature as needed</p>
+                <p>• The feature is always active when a winner name is set</p>
             </div>
             
             <form method="POST" action="{{ route('custom-winner.update') }}">
@@ -287,17 +283,6 @@
                     </small>
                 </div>
                 
-                <div class="form-check">
-                    <input type="checkbox" 
-                           class="form-check-input" 
-                           id="enabled" 
-                           name="enabled" 
-                           value="1"
-                           {{ old('enabled', $customWinner['enabled']) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="enabled">
-                        <i class="fas fa-toggle-on"></i> Enable Custom Winner
-                    </label>
-                </div>
                 
                 <div class="d-flex flex-wrap">
                     <button type="submit" class="btn btn-primary">

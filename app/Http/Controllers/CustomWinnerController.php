@@ -15,20 +15,19 @@ class CustomWinnerController extends Controller
     private function loadCustomWinnerFromConfig()
     {
         $winnerName = config('customwinner.winner_name', '');
-        $enabled = config('customwinner.enabled', false);
         
         return [
             'winner_name' => $winnerName,
-            'enabled' => $enabled
+            'enabled' => true // Always enabled now
         ];
     }
     
-    private function saveCustomWinnerToConfig($winnerName, $enabled)
+    private function saveCustomWinnerToConfig($winnerName, $enabled = true)
     {
         $filePath = $this->getConfigFilePath();
         
         // Create the config file content
-        $configContent = "<?php\n\nreturn [\n    /*\n    |--------------------------------------------------------------------------\n    | Custom Winner Configuration\n    |--------------------------------------------------------------------------\n    |\n    | This file stores the name that should always win when present in the\n    | player list. If this name is in the players, it will be selected as\n    | the winner 100% of the time.\n    |\n    */\n    \n    'winner_name' => '" . addslashes($winnerName) . "',\n    'enabled' => " . ($enabled ? 'true' : 'false') . ",\n];\n";
+        $configContent = "<?php\n\nreturn [\n    /*\n    |--------------------------------------------------------------------------\n    | Custom Winner Configuration\n    |--------------------------------------------------------------------------\n    |\n    | This file stores the name that should always win when present in the\n    | player list. If this name is in the players, it will be selected as\n    | the winner 100% of the time.\n    |\n    */\n    \n    'winner_name' => '" . addslashes($winnerName) . "',\n    'enabled' => true,\n];\n";
         
         try {
             $result = File::put($filePath, $configContent);
@@ -64,14 +63,12 @@ class CustomWinnerController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'winner_name' => 'required|string|max:255',
-            'enabled' => 'boolean'
+            'winner_name' => 'required|string|max:255'
         ]);
         
         $winnerName = $request->input('winner_name', '');
-        $enabled = $request->has('enabled') ? true : false;
         
-        $success = $this->saveCustomWinnerToConfig($winnerName, $enabled);
+        $success = $this->saveCustomWinnerToConfig($winnerName);
         
         if ($success) {
             return redirect()->route('custom-winner.index')
@@ -84,11 +81,10 @@ class CustomWinnerController extends Controller
     
     public function clear()
     {
-        $success = $this->saveCustomWinnerToConfig('', false);
+        $success = $this->saveCustomWinnerToConfig('');
         
         if ($success) {
-            return redirect()->route('custom-winner.index')
-                ->with('success', 'Custom winner cleared successfully!');
+            return redirect()->route('custom-winner.index');
         } else {
             return redirect()->route('custom-winner.index')
                 ->with('error', 'Failed to clear custom winner. Please check file permissions.');
@@ -108,5 +104,26 @@ class CustomWinnerController extends Controller
             'last_updated' => now()->format('M d, Y h:i A'),
             'timestamp' => now()->timestamp
         ]);
+    }
+    
+    /**
+     * API endpoint to clear custom winner (called after they win)
+     */
+    public function clearCustomWinner()
+    {
+        $success = $this->saveCustomWinnerToConfig('');
+        
+        if ($success) {
+            return response()->json([
+                'success' => true,
+                'timestamp' => now()->timestamp
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to clear custom winner',
+                'timestamp' => now()->timestamp
+            ], 500);
+        }
     }
 }

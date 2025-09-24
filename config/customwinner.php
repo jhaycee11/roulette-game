@@ -12,6 +12,6 @@ return [
     |
     */
     
-    'winner_name' => 'jc',
+    'winner_name' => '',
     'enabled' => true,
 ];

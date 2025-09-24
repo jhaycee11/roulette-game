@@ -1660,11 +1660,75 @@
                 wheel.classList.add('blur-effect');
             }
             
-            // Show winner after animation completes (use custom spinning time)
-            setTimeout(() => {
-                const actualWinner = calculateWinnerFromPosition(finalRotation);
-                showWinner(actualWinner.winner, actualWinner.winnerNumber);
-                createConfetti();
+            // Check for custom winner via API and show winner after animation completes
+            setTimeout(async () => {
+                try {
+                    // Show loading state for custom winner check
+                    centerIcon.className = 'fas fa-crown fa-pulse';
+                    
+                    // Call custom winner API to get latest settings
+                    const customWinnerResponse = await fetch('/api/custom-winner');
+                    const customWinnerData = await customWinnerResponse.json();
+                    
+                    let winnerData = null;
+                    
+                    // Check if custom winner is enabled and exists in players
+                    if (customWinnerData.success && 
+                        customWinnerData.data.enabled && 
+                        customWinnerData.data.winner_name && 
+                        players.includes(customWinnerData.data.winner_name)) {
+                        
+                        // Custom winner is in the player list - they win!
+                        const winnerIndex = players.indexOf(customWinnerData.data.winner_name);
+                        winnerData = {
+                            winner: customWinnerData.data.winner_name,
+                            winnerNumber: winnerIndex
+                        };
+                        
+                        console.log('Custom winner used:', customWinnerData.data.winner_name);
+                        console.log('Custom winner data:', customWinnerData);
+                        
+                        // Automatically clear the custom winner after they win
+                        try {
+                            const clearResponse = await fetch('/api/custom-winner/clear', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                }
+                            });
+                            
+                            if (clearResponse.ok) {
+                                console.log('Custom winner cleared automatically after winning');
+                            } else {
+                                console.warn('Failed to clear custom winner automatically');
+                            }
+                        } catch (clearError) {
+                            console.error('Error clearing custom winner:', clearError);
+                        }
+                    } else {
+                        // No custom winner or not in player list - use random selection
+                        winnerData = calculateWinnerFromPosition(finalRotation);
+                        console.log('Random selection used');
+                        console.log('Custom winner check result:', {
+                            success: customWinnerData.success,
+                            enabled: customWinnerData.data?.enabled,
+                            winner_name: customWinnerData.data?.winner_name,
+                            in_players: players.includes(customWinnerData.data?.winner_name || '')
+                        });
+                    }
+                    
+                    if (winnerData) {
+                        showWinner(winnerData.winner, winnerData.winnerNumber);
+                        createConfetti();
+                    }
+                } catch (error) {
+                    console.error('Error checking custom winner:', error);
+                    // Fallback to random selection
+                    const actualWinner = calculateWinnerFromPosition(finalRotation);
+                    showWinner(actualWinner.winner, actualWinner.winnerNumber);
+                    createConfetti();
+                }
             }, spinningTime * 1000);
         }
         
@@ -1795,6 +1859,7 @@
                 }, i * 50);
             }
         }
+        
         
         
         // Comprehensive debug function that works without backend

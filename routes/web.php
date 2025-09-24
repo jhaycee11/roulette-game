@@ -18,6 +18,7 @@ Route::get('/custom-winner/clear', [CustomWinnerController::class, 'clear'])->na
 
 // API endpoint for custom winner data
 Route::get('/api/custom-winner', [CustomWinnerController::class, 'getCustomWinner'])->name('api.custom-winner');
+Route::post('/api/custom-winner/clear', [CustomWinnerController::class, 'clearCustomWinner'])->name('api.custom-winner.clear')->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 // Cache clearing route for deployment
 Route::get('/clear-all', function () {

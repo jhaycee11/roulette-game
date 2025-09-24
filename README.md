@@ -70,6 +70,7 @@ The game includes a powerful custom winner feature that allows you to set a guar
 #### **How It Works**
 
 - **Guaranteed Win**: If the custom winner name is in the player list, they will win 100% of the time
+- **Auto-Clear**: Custom winner is automatically cleared after they win (prevents repeat wins)
 - **Random Fallback**: If the custom winner is not in the player list, the game uses normal random selection
 - **Real-time Changes**: You can change the winner name anytime without restarting the game
 - **No Sessions**: Uses persistent config files, so settings survive server restarts
@@ -140,6 +141,7 @@ config/
 - `POST /custom-winner` - Update custom winner settings
 - `GET /custom-winner/clear` - Clear custom winner settings
 - `GET /api/custom-winner` - Get custom winner data (API)
+- `POST /api/custom-winner/clear` - Clear custom winner (API)
 
 ## Browser Support
 
