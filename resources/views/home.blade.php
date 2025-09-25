@@ -942,6 +942,43 @@
                 font-size: 1rem;
             }
         }
+        
+        /* Editable Title Styles */
+        #gameTitle {
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: 0;
+        }
+        
+        #gameTitle.editing {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid #007bff;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        #editTitleBtn {
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        #editTitleBtn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        #editTitleBtn i {
+            font-size: 0.9rem;
+        }
+        
+        /* Focus styles for better UX */
+        #gameTitle:focus {
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -1014,10 +1051,12 @@
             <div class="game-content">
                 <div class="game-title">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h1><i class="fas fa-dice"></i> Roulette Game</h1>
-                        <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
-                            <i class="fas fa-cog me-1"></i>Admin
-                        </a>
+                        <div class="d-flex align-items-center">
+                            <h1><i class="fas fa-dice"></i> <span id="gameTitle" contenteditable="false">Roulette Game</span></h1>
+                            <button type="button" class="btn btn-link p-0 ms-2" id="editTitleBtn" onclick="toggleTitleEdit()">
+                                <i class="fas fa-pencil-alt text-muted"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
@@ -1078,6 +1117,8 @@
         let players = [];
         let settingsVisible = false;
         let spinningTime = 4; // Default spinning time in seconds
+        let isTitleEditing = false;
+        let originalTitle = '';
         
         // Hide player list
         function hidePlayerList() {
@@ -1122,6 +1163,74 @@
             const settingsPanel = document.getElementById('settingsPanel');
             settingsVisible = false;
             settingsPanel.classList.remove('show');
+        }
+        
+        // Toggle title editing
+        function toggleTitleEdit() {
+            const titleElement = document.getElementById('gameTitle');
+            const editBtn = document.getElementById('editTitleBtn');
+            const editIcon = editBtn.querySelector('i');
+            
+            if (!isTitleEditing) {
+                // Start editing
+                originalTitle = titleElement.textContent;
+                titleElement.contentEditable = true;
+                titleElement.focus();
+                titleElement.classList.add('editing');
+                editIcon.className = 'fas fa-check text-success';
+                isTitleEditing = true;
+                
+                // Add event listeners for save/cancel
+                titleElement.addEventListener('blur', saveTitle);
+                titleElement.addEventListener('keydown', handleTitleKeydown);
+            } else {
+                // Save changes
+                saveTitle();
+            }
+        }
+        
+        // Save title changes
+        function saveTitle() {
+            const titleElement = document.getElementById('gameTitle');
+            const editBtn = document.getElementById('editTitleBtn');
+            const editIcon = editBtn.querySelector('i');
+            
+            titleElement.contentEditable = false;
+            titleElement.classList.remove('editing');
+            editIcon.className = 'fas fa-pencil-alt text-muted';
+            isTitleEditing = false;
+            
+            // Remove event listeners
+            titleElement.removeEventListener('blur', saveTitle);
+            titleElement.removeEventListener('keydown', handleTitleKeydown);
+        }
+        
+        // Handle keyboard events for title editing
+        function handleTitleKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveTitle();
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                cancelTitleEdit();
+            }
+        }
+        
+        // Cancel title editing
+        function cancelTitleEdit() {
+            const titleElement = document.getElementById('gameTitle');
+            const editBtn = document.getElementById('editTitleBtn');
+            const editIcon = editBtn.querySelector('i');
+            
+            titleElement.textContent = originalTitle;
+            titleElement.contentEditable = false;
+            titleElement.classList.remove('editing');
+            editIcon.className = 'fas fa-pencil-alt text-muted';
+            isTitleEditing = false;
+            
+            // Remove event listeners
+            titleElement.removeEventListener('blur', saveTitle);
+            titleElement.removeEventListener('keydown', handleTitleKeydown);
         }
         
         // Validate spinning time input
