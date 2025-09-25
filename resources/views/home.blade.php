@@ -7,6 +7,7 @@
     <title>Roulette Game - Spin the Wheel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<<<<<<< Updated upstream
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1155,6 +1156,9 @@
             }
         }
     </style>
+=======
+    @vite(['resources/css/roulette.css'])
+>>>>>>> Stashed changes
 </head>
 <body>
     <div class="main-container">
@@ -1181,8 +1185,6 @@
             <input type="file" id="photoUploadBottomRight" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'bottom-right')">
         </button>
                     
-        
-        
         
         <!-- Settings Panel -->
         <div class="settings-panel" id="settingsPanel">
@@ -1271,7 +1273,6 @@
                     </div>
                 </div>
                 
-                
                 <!-- Roulette Wheel (always visible now) -->
                 <div class="wheel-container" id="wheelContainer">
                     <div class="pointer"></div>
@@ -1281,7 +1282,6 @@
                         </div>
                     </div>
                 </div>
-                
                 
                 <!-- Winner Popup Overlay -->
                 <div class="winner-popup-overlay" id="winnerPopupOverlay">
@@ -1314,6 +1314,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<<<<<<< Updated upstream
     <script>
         let isSpinning = false;
         let wheelSections = [];
@@ -2558,5 +2559,8 @@
             }
         });
     </script>
+=======
+    @vite(['resources/js/roulette.js'])
+>>>>>>> Stashed changes
 </body>
 </html>
