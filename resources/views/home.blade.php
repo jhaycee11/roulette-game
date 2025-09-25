@@ -285,6 +285,26 @@
             color: #6c757d;
         }
         
+        .upload-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .image-preview {
+            text-align: center;
+        }
+        
+        .image-preview img {
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview img:hover {
+            transform: scale(1.05);
+            border-color: #007bff !important;
+        }
+        
         .toggle-btn:hover {
             background: #c82333;
             transform: scale(1.1);
@@ -1185,6 +1205,23 @@
                 <input type="range" class="time-slider" id="spinningTimeSlider" min="1" max="60" value="4">
                 <div class="time-display" id="timeDisplay">4 seconds</div>
             </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Custom Play Button Image</label>
+                <div class="upload-section">
+                    <input type="file" id="playButtonImageUpload" accept="image/*" style="display: none;" onchange="handlePlayButtonImageUpload(this)">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="triggerPlayButtonImageUpload()">
+                        <i class="fas fa-upload"></i> Upload Image
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="removePlayButtonImage" onclick="removePlayButtonImage()" style="display: none;">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+                <div class="image-preview" id="playButtonImagePreview" style="display: none; margin-top: 0.5rem;">
+                    <img id="playButtonPreviewImg" src="" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 2px solid #e9ecef;">
+                </div>
+                <small class="text-muted">Upload a custom image for the play button. Recommended size: 100x100px or larger.</small>
+            </div>
         </div>
         
         <!-- Show Toggle Button (appears when list is hidden) -->
@@ -1292,6 +1329,7 @@
             'bottom-left': null,
             'bottom-right': null
         };
+        let playButtonImage = null;
         
         // Hide player list
         function hidePlayerList() {
@@ -1496,6 +1534,118 @@
             button.title = '';
         }
         
+        // Trigger play button image upload
+        function triggerPlayButtonImageUpload() {
+            const fileInput = document.getElementById('playButtonImageUpload');
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+        
+        // Handle play button image upload
+        function handlePlayButtonImageUpload(input) {
+            const file = input.files[0];
+            if (file && file.type.startsWith('image/')) {
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size must be less than 5MB');
+                    input.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Check if this is the same image as before
+                    if (playButtonImage === e.target.result) {
+                        alert('This image is already uploaded!');
+                        input.value = '';
+                        return;
+                    }
+                    
+                    playButtonImage = e.target.result;
+                    displayPlayButtonImage(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid image file');
+                input.value = '';
+            }
+            // Clear the input value to allow re-uploading the same file
+            input.value = '';
+        }
+        
+        // Display play button image
+        function displayPlayButtonImage(imageData) {
+            const preview = document.getElementById('playButtonImagePreview');
+            const previewImg = document.getElementById('playButtonPreviewImg');
+            const removeBtn = document.getElementById('removePlayButtonImage');
+            
+            previewImg.src = imageData;
+            preview.style.display = 'block';
+            removeBtn.style.display = 'inline-block';
+            
+            // Update the actual play button
+            updatePlayButtonWithImage(imageData);
+        }
+        
+        // Update play button with custom image
+        function updatePlayButtonWithImage(imageData) {
+            const wheelCenter = document.getElementById('wheelCenter');
+            const centerIcon = document.getElementById('centerIcon');
+            
+            // Store original content
+            if (!wheelCenter.dataset.originalContent) {
+                wheelCenter.dataset.originalContent = wheelCenter.innerHTML;
+            }
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = imageData;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '50%';
+            
+            // Replace content with image
+            wheelCenter.innerHTML = '';
+            wheelCenter.appendChild(img);
+            
+            // Add a play icon overlay
+            const playIcon = document.createElement('i');
+            playIcon.className = 'fas fa-play';
+            playIcon.style.position = 'absolute';
+            playIcon.style.top = '50%';
+            playIcon.style.left = '50%';
+            playIcon.style.transform = 'translate(-50%, -50%)';
+            playIcon.style.color = 'white';
+            playIcon.style.fontSize = '1.5rem';
+            playIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
+            playIcon.style.zIndex = '10';
+            playIcon.id = 'centerIcon';
+            
+            wheelCenter.appendChild(playIcon);
+        }
+        
+        // Remove play button image
+        function removePlayButtonImage() {
+            const preview = document.getElementById('playButtonImagePreview');
+            const removeBtn = document.getElementById('removePlayButtonImage');
+            const wheelCenter = document.getElementById('wheelCenter');
+            
+            // Hide preview and remove button
+            preview.style.display = 'none';
+            removeBtn.style.display = 'none';
+            
+            // Restore original play button
+            if (wheelCenter.dataset.originalContent) {
+                wheelCenter.innerHTML = wheelCenter.dataset.originalContent;
+            } else {
+                wheelCenter.innerHTML = '<i class="fas fa-play" id="centerIcon"></i>';
+            }
+            
+            playButtonImage = null;
+        }
+        
         // Validate spinning time input
         function validateSpinningTime(time) {
             const isValid = time >= 1 && time <= 60 && !isNaN(time);
@@ -1656,7 +1806,22 @@
             const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = false;
-            centerIcon.className = 'fas fa-play';
+            
+            // Handle icon display based on whether custom image is set
+            if (playButtonImage) {
+                centerIcon.className = 'fas fa-play';
+                centerIcon.style.position = 'absolute';
+                centerIcon.style.top = '50%';
+                centerIcon.style.left = '50%';
+                centerIcon.style.transform = 'translate(-50%, -50%)';
+                centerIcon.style.color = 'white';
+                centerIcon.style.fontSize = '1.5rem';
+                centerIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
+                centerIcon.style.zIndex = '10';
+            } else {
+                centerIcon.className = 'fas fa-play';
+            }
+            
             document.getElementById('emptyWheelMessage').style.display = 'none';
             
             // Always start slow spin when not spinning
@@ -1671,7 +1836,22 @@
             const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = true;
-            centerIcon.className = 'fas fa-play';
+            
+            // Handle icon display based on whether custom image is set
+            if (playButtonImage) {
+                centerIcon.className = 'fas fa-play';
+                centerIcon.style.position = 'absolute';
+                centerIcon.style.top = '50%';
+                centerIcon.style.left = '50%';
+                centerIcon.style.transform = 'translate(-50%, -50%)';
+                centerIcon.style.color = 'white';
+                centerIcon.style.fontSize = '1.5rem';
+                centerIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
+                centerIcon.style.zIndex = '10';
+            } else {
+                centerIcon.className = 'fas fa-play';
+            }
+            
             document.getElementById('emptyWheelMessage').style.display = 'block';
             
             // Keep slow spin running even when no players (continuous animation)
@@ -1834,11 +2014,20 @@
             wheel.innerHTML = '<div class="wheel-center" id="wheelCenter" onclick="spinWheel()"><i class="fas fa-play" id="centerIcon"></i></div>';
             wheelSections = [];
             
+            // Restore custom image if it exists
+            if (playButtonImage) {
+                updatePlayButtonWithImage(playButtonImage);
+            }
+            
             // If no players, show empty wheel message
             if (totalSections === 0) {
                 wheel.innerHTML = `
                     <div class="wheel-center" id="wheelCenter" onclick="spinWheel()"><i class="fas fa-play" id="centerIcon"></i></div>
                 `;
+                // Restore custom image if it exists
+                if (playButtonImage) {
+                    updatePlayButtonWithImage(playButtonImage);
+                }
                 return;
             }
             
@@ -2168,7 +2357,24 @@
             
             isSpinning = false;
             wheelCenter.disabled = false;
-            centerIcon.className = 'fas fa-play';
+            
+            // Reset icon - handle both custom image and default cases
+            if (playButtonImage) {
+                // If custom image is set, ensure the play icon is properly styled
+                centerIcon.className = 'fas fa-play';
+                centerIcon.style.position = 'absolute';
+                centerIcon.style.top = '50%';
+                centerIcon.style.left = '50%';
+                centerIcon.style.transform = 'translate(-50%, -50%)';
+                centerIcon.style.color = 'white';
+                centerIcon.style.fontSize = '1.5rem';
+                centerIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
+                centerIcon.style.zIndex = '10';
+            } else {
+                // Default play button
+                centerIcon.className = 'fas fa-play';
+            }
+            
             wheel.classList.remove('spinning');
             wheel.classList.remove('blur-effect');
             
