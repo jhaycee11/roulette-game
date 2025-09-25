@@ -1591,11 +1591,10 @@
         // Update play button with custom image
         function updatePlayButtonWithImage(imageData) {
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             
-            // Store original content
+            // Store original content (default play icon)
             if (!wheelCenter.dataset.originalContent) {
-                wheelCenter.dataset.originalContent = wheelCenter.innerHTML;
+                wheelCenter.dataset.originalContent = '<i class="fas fa-play" id="centerIcon"></i>';
             }
             
             // Create image element
@@ -1606,24 +1605,9 @@
             img.style.objectFit = 'cover';
             img.style.borderRadius = '50%';
             
-            // Replace content with image
+            // Replace content with image only (no play icon)
             wheelCenter.innerHTML = '';
             wheelCenter.appendChild(img);
-            
-            // Add a play icon overlay
-            const playIcon = document.createElement('i');
-            playIcon.className = 'fas fa-play';
-            playIcon.style.position = 'absolute';
-            playIcon.style.top = '50%';
-            playIcon.style.left = '50%';
-            playIcon.style.transform = 'translate(-50%, -50%)';
-            playIcon.style.color = 'white';
-            playIcon.style.fontSize = '1.5rem';
-            playIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
-            playIcon.style.zIndex = '10';
-            playIcon.id = 'centerIcon';
-            
-            wheelCenter.appendChild(playIcon);
         }
         
         // Remove play button image
@@ -1636,7 +1620,7 @@
             preview.style.display = 'none';
             removeBtn.style.display = 'none';
             
-            // Restore original play button
+            // Restore original play button with default icon
             if (wheelCenter.dataset.originalContent) {
                 wheelCenter.innerHTML = wheelCenter.dataset.originalContent;
             } else {
@@ -1803,24 +1787,8 @@
         // Show game controls
         function showGameControls() {
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = false;
-            
-            // Handle icon display based on whether custom image is set
-            if (playButtonImage) {
-                centerIcon.className = 'fas fa-play';
-                centerIcon.style.position = 'absolute';
-                centerIcon.style.top = '50%';
-                centerIcon.style.left = '50%';
-                centerIcon.style.transform = 'translate(-50%, -50%)';
-                centerIcon.style.color = 'white';
-                centerIcon.style.fontSize = '1.5rem';
-                centerIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
-                centerIcon.style.zIndex = '10';
-            } else {
-                centerIcon.className = 'fas fa-play';
-            }
             
             document.getElementById('emptyWheelMessage').style.display = 'none';
             
@@ -1833,24 +1801,8 @@
         // Hide game controls
         function hideGameControls() {
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = true;
-            
-            // Handle icon display based on whether custom image is set
-            if (playButtonImage) {
-                centerIcon.className = 'fas fa-play';
-                centerIcon.style.position = 'absolute';
-                centerIcon.style.top = '50%';
-                centerIcon.style.left = '50%';
-                centerIcon.style.transform = 'translate(-50%, -50%)';
-                centerIcon.style.color = 'white';
-                centerIcon.style.fontSize = '1.5rem';
-                centerIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
-                centerIcon.style.zIndex = '10';
-            } else {
-                centerIcon.className = 'fas fa-play';
-            }
             
             document.getElementById('emptyWheelMessage').style.display = 'block';
             
@@ -2150,12 +2102,10 @@
             
             isSpinning = true;
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             const winnerAnnouncement = document.getElementById('winnerAnnouncement');
             
             wheelCenter.disabled = true;
-            centerIcon.className = 'fas fa-spinner fa-spin';
             
             // Hide previous winner announcement
             winnerAnnouncement.classList.remove('show');
@@ -2352,28 +2302,10 @@
         
         function resetButton() {
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             
             isSpinning = false;
             wheelCenter.disabled = false;
-            
-            // Reset icon - handle both custom image and default cases
-            if (playButtonImage) {
-                // If custom image is set, ensure the play icon is properly styled
-                centerIcon.className = 'fas fa-play';
-                centerIcon.style.position = 'absolute';
-                centerIcon.style.top = '50%';
-                centerIcon.style.left = '50%';
-                centerIcon.style.transform = 'translate(-50%, -50%)';
-                centerIcon.style.color = 'white';
-                centerIcon.style.fontSize = '1.5rem';
-                centerIcon.style.textShadow = '2px 2px 4px rgba(0,0,0,0.7)';
-                centerIcon.style.zIndex = '10';
-            } else {
-                // Default play button
-                centerIcon.className = 'fas fa-play';
-            }
             
             wheel.classList.remove('spinning');
             wheel.classList.remove('blur-effect');
