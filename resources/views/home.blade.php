@@ -22,7 +22,7 @@
             justify-content: center;
             align-items: center;
             min-height: calc(100vh - 4rem);
-            padding: 2rem 0;
+            padding: .5rem 0;
             overflow-x: hidden;
             overflow-y: hidden;
             position: relative;
@@ -38,6 +38,7 @@
             position: relative;
             max-width: 1000px;
             width: 100%;
+            z-index: 10;
         }
         
         .player-section {
@@ -379,8 +380,8 @@
             width: 600px;
             height: 600px;
             margin: 2rem auto;
-            min-width: 500px;
-            min-height: 500px;
+            min-width: 700px;
+            min-height: 700px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1028,7 +1029,8 @@
             left: 0;
             width: 50vw;
             height: 50vh;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: top left;
             border-radius: 0;
             z-index: 5;
         }
@@ -1039,7 +1041,8 @@
             right: 0;
             width: 50vw;
             height: 50vh;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: top right;
             border-radius: 0;
             z-index: 5;
         }
@@ -1050,7 +1053,8 @@
             left: 0;
             width: 50vw;
             height: 50vh;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: bottom left;
             border-radius: 0;
             z-index: 5;
         }
@@ -1061,7 +1065,8 @@
             right: 0;
             width: 50vw;
             height: 50vh;
-            object-fit: cover;
+            object-fit: contain;
+            object-position: bottom right;
             border-radius: 0;
             z-index: 5;
         }
