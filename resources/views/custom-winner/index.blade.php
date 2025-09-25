@@ -225,7 +225,7 @@
         <div class="settings-card">
             <div class="header">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h1><i class="fas fa-crown"></i> Custom Winner</h1>
+                    <h1><i class="fas"></i>🩻🩻🩻</h1>
                     <div>
                         <span class="text-muted me-3">Welcome, {{ Auth::guard('static')->user()->name }}!</span>
                         <form method="POST" action="{{ route('logout') }}" class="d-inline">
@@ -236,7 +236,6 @@
                         </form>
                     </div>
                 </div>
-                <div class="subtitle">Set a guaranteed winner for the roulette game</div>
             </div>
             
             @if(session('success'))
@@ -254,43 +253,28 @@
             @endif
             
             <div class="current-settings">
-                <h5><i class="fas fa-info-circle"></i> Current Settings</h5>
-                <p><strong>Winner Name:</strong> 
                     @if($customWinner['winner_name'])
-                        "{{ $customWinner['winner_name'] }}"
-                    @else
-                        <em>No winner set</em>
+                     <h3>🤑🤑🤑{{ $customWinner['winner_name'] }}🤑🤑🤑</h3> 
                     @endif
-                </p>
-                <p><strong>Status:</strong> 
-                    <span class="status-badge status-enabled">Always Enabled</span>
                 </p>
             </div>
             
-            <div class="info-box">
-                <h6><i class="fas fa-lightbulb"></i> How it works:</h6>
-                <p>• Set a name that will win 100% of the time when present in the player list</p>
-                <p>• If the custom winner is not in the player list, the game will be random</p>
-                <p>• You can change the winner name anytime without restarting the game</p>
-                <p>• The feature is always active when a winner name is set</p>
-            </div>
             
             <form method="POST" action="{{ route('custom-winner.update') }}">
                 @csrf
                 
                 <div class="form-group">
                     <label for="winner_name" class="form-label">
-                        <i class="fas fa-user-crown"></i> Winner Name
+                        <i class="fas fa-user-crown"></i> Super User
                     </label>
                     <input type="text" 
                            class="form-control" 
                            id="winner_name" 
                            name="winner_name" 
                            value="{{ old('winner_name', $customWinner['winner_name']) }}"
-                           placeholder="Enter the name that should always win"
+                           placeholder="Do not write your name 💀"
                            required>
                     <small class="form-text text-muted">
-                        This name must match exactly with a player name to work
                     </small>
                 </div>
                 
@@ -304,10 +288,6 @@
                        class="btn btn-danger"
                        onclick="return confirm('Are you sure you want to clear the custom winner?')">
                         <i class="fas fa-trash"></i> Clear Winner
-                    </a>
-                    
-                    <a href="{{ route('home') }}" class="btn btn-secondary">
-                        <i class="fas fa-home"></i> Back to Game
                     </a>
                 </div>
             </form>
