@@ -1014,7 +1014,7 @@
         
         .upload-btn.has-image:hover {
             opacity: 1;
-            transform: scale(1.05);
+            transform: none;
         }
         
         .upload-btn i {
@@ -1440,6 +1440,8 @@
                 };
                 reader.readAsDataURL(file);
             }
+            // Clear the input value to allow re-uploading the same file
+            input.value = '';
         }
         
         // Display uploaded photo
@@ -1458,7 +1460,8 @@
             icon.style.display = 'none';
             button.appendChild(img);
             
-            // Add click handler to remove photo
+            // Remove original onclick and add new click handler to remove photo
+            button.removeAttribute('onclick');
             button.onclick = function() {
                 removePhoto(position);
             };
