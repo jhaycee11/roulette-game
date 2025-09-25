@@ -979,6 +979,156 @@
         #gameTitle:focus {
             outline: none;
         }
+        
+        /* Photo Upload Buttons */
+        .upload-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0.2;
+            overflow: hidden;
+        }
+        
+        .upload-btn:hover {
+            opacity: 0.6;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .upload-btn.has-image {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .upload-btn.has-image:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        
+        .upload-btn i {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        /* Image positioning for different quadrants - covering 50% of screen */
+        .upload-btn-top-left img {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: cover;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        .upload-btn-top-right img {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: cover;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        .upload-btn-bottom-left img {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: cover;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        .upload-btn-bottom-right img {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: cover;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        /* Position upload buttons around the wheel */
+        .upload-btn-top-left {
+            top: 8em;
+            left: 13em;
+        }
+        
+        .upload-btn-top-right {
+            top: 8em;
+            right: 13em;
+        }
+        
+        .upload-btn-bottom-left {
+            bottom: 8em;
+            left: 13em;
+        }
+        
+        .upload-btn-bottom-right {
+            bottom: 8em;
+            right: 13em;
+        }
+        
+        /* Responsive sizing for upload buttons */
+        @media (max-width: 768px) {
+            .upload-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .upload-btn i {
+                font-size: 1.2rem;
+            }
+            
+            .upload-btn-top-left,
+            .upload-btn-top-right {
+                top: 10px;
+            }
+            
+            .upload-btn-bottom-left,
+            .upload-btn-bottom-right {
+                bottom: 10px;
+            }
+            
+            .upload-btn-top-left,
+            .upload-btn-bottom-left {
+                left: 10px;
+            }
+            
+            .upload-btn-top-right,
+            .upload-btn-bottom-right {
+                right: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .upload-btn {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .upload-btn i {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -987,6 +1137,25 @@
         <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()">
             <i class="fas fa-cog"></i>
         </button>
+
+         <!-- Upload buttons positioned around the wheel -->
+         <button class="upload-btn upload-btn-top-left" onclick="triggerPhotoUpload('top-left')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadTopLeft" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'top-left')">
+        </button>
+        <button class="upload-btn upload-btn-top-right" onclick="triggerPhotoUpload('top-right')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadTopRight" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'top-right')">
+        </button>
+        <button class="upload-btn upload-btn-bottom-left" onclick="triggerPhotoUpload('bottom-left')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadBottomLeft" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'bottom-left')">
+        </button>
+        <button class="upload-btn upload-btn-bottom-right" onclick="triggerPhotoUpload('bottom-right')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadBottomRight" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'bottom-right')">
+        </button>
+                    
         
         
         
@@ -1036,7 +1205,7 @@
                 <textarea 
                     class="form-control" 
                     id="playersTextarea" 
-                    rows="10" 
+                    rows="20" 
                     placeholder="Enter player names"
                     style="resize: vertical; min-height: 300px; overflow-y: auto;"
                 ></textarea>
@@ -1067,13 +1236,6 @@
                     <div class="roulette-wheel slow-spin" id="rouletteWheel">
                         <div class="wheel-center" id="wheelCenter" onclick="spinWheel()">
                             <i class="fas fa-play" id="centerIcon"></i>
-                        </div>
-                        <div class="empty-wheel-message" id="emptyWheelMessage">
-                            <div class="empty-message-text">
-                                <i class="fas fa-plus-circle"></i><br>
-                                Add players to start spinning!<br>
-                                <small>Enter names in the textarea</small>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1119,6 +1281,12 @@
         let spinningTime = 4; // Default spinning time in seconds
         let isTitleEditing = false;
         let originalTitle = '';
+        let uploadedPhotos = {
+            'top-left': null,
+            'top-right': null,
+            'bottom-left': null,
+            'bottom-right': null
+        };
         
         // Hide player list
         function hidePlayerList() {
@@ -1231,6 +1399,93 @@
             // Remove event listeners
             titleElement.removeEventListener('blur', saveTitle);
             titleElement.removeEventListener('keydown', handleTitleKeydown);
+        }
+        
+        // Trigger photo upload
+        function triggerPhotoUpload(position) {
+            let inputId;
+            switch(position) {
+                case 'top-left':
+                    inputId = 'photoUploadTopLeft';
+                    break;
+                case 'top-right':
+                    inputId = 'photoUploadTopRight';
+                    break;
+                case 'bottom-left':
+                    inputId = 'photoUploadBottomLeft';
+                    break;
+                case 'bottom-right':
+                    inputId = 'photoUploadBottomRight';
+                    break;
+            }
+            const fileInput = document.getElementById(inputId);
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+        
+        // Handle photo upload
+        function handlePhotoUpload(input, position) {
+            const file = input.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedPhotos[position] = e.target.result;
+                    displayPhoto(position, e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // Display uploaded photo
+        function displayPhoto(position, imageData) {
+            const button = document.querySelector(`.upload-btn-${position}`);
+            const icon = button.querySelector('i');
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = imageData;
+            
+            // Add has-image class for styling
+            button.classList.add('has-image');
+            
+            // Replace icon with image
+            icon.style.display = 'none';
+            button.appendChild(img);
+            
+            // Add click handler to remove photo
+            button.onclick = function() {
+                removePhoto(position);
+            };
+            
+            // Change cursor to indicate removal
+            button.style.cursor = 'pointer';
+            button.title = 'Click to remove photo';
+        }
+        
+        // Remove photo
+        function removePhoto(position) {
+            const button = document.querySelector(`.upload-btn-${position}`);
+            const img = button.querySelector('img');
+            const icon = button.querySelector('i');
+            
+            if (img) {
+                img.remove();
+            }
+            
+            // Remove has-image class
+            button.classList.remove('has-image');
+            
+            icon.style.display = 'block';
+            uploadedPhotos[position] = null;
+            
+            // Restore original click handler
+            button.onclick = function() {
+                triggerPhotoUpload(position);
+            };
+            
+            button.style.cursor = 'pointer';
+            button.title = '';
         }
         
         // Validate spinning time input
