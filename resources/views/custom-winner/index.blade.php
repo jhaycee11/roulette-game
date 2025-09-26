@@ -6,7 +6,7 @@
     <title>Custom Winner Settings - Roulette Game</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    @vite(['resources/css/custom-winner.css'])
+    @vite(['resources/css/custom-winner.css', 'resources/js/app.js'])
 </head>
 <body>    
     <div class="main-container">
