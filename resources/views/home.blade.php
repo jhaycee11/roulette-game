@@ -1154,10 +1154,378 @@
                 font-size: 1rem;
             }
         }
+        
+        /* Theme Styles */
+        .theme-regular {
+            /* Default theme - no changes needed */
+        }
+        
+        .theme-halloween {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #1a1a1a 100%);
+            position: relative;
+        }
+        
+        .theme-halloween::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 165, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(128, 0, 128, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .theme-halloween .game-title h1 {
+            color: #ff6b35;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+        
+        .theme-halloween .game-title p {
+            color: #ffa500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .theme-halloween .roulette-wheel {
+            border: 6px solid #8b4513;
+            box-shadow: 
+                0 0 30px rgba(255, 107, 53, 0.4),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #2d1810, #1a1a1a);
+        }
+        
+        .theme-halloween .wheel-center {
+            background: linear-gradient(135deg, #ff6b35 0%, #8b0000 100%);
+            border: 4px solid #ffa500;
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
+        }
+        
+        .theme-halloween .wheel-center:hover:not(:disabled) {
+            background: linear-gradient(135deg, #ff8c42 0%, #a52a2a 100%);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.8);
+        }
+        
+        .theme-halloween .pointer {
+            border-top: 40px solid #ff6b35;
+        }
+        
+        .theme-halloween .pointer::before {
+            border-top: 15px solid #8b0000;
+        }
+        
+        .theme-halloween .player-section {
+            background: rgba(26, 26, 26, 0.95);
+            border: 2px solid #ff6b35;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .theme-halloween .player-section h3 {
+            color: #ff6b35;
+        }
+        
+        .theme-halloween .settings-panel {
+            background: rgba(26, 26, 26, 0.95);
+            border: 2px solid #ff6b35;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .theme-halloween .settings-header h4 {
+            color: #ff6b35;
+        }
+        
+        .theme-halloween .setting-label {
+            color: #ffa500;
+        }
+        
+        .theme-halloween .winner-announcement {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #8b0000 100%);
+            border: 3px solid #ff6b35;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+        }
+        
+        .theme-halloween .winner-name {
+            color: #ff6b35;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+        }
+        
+        .theme-halloween .congratulations-text {
+            color: #ffa500;
+        }
+        
+        /* Theme Decorations */
+        .theme-decoration {
+            position: fixed;
+            pointer-events: none;
+            z-index: 5;
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .decoration-1 { font-size: 2rem; animation-delay: 0s; }
+        .decoration-2 { font-size: 1.5rem; animation-delay: 1s; }
+        .decoration-3 { font-size: 1.2rem; animation-delay: 2s; }
+        .decoration-4 { font-size: 1.8rem; animation-delay: 3s; }
+        .decoration-5 { font-size: 1.6rem; animation-delay: 0.5s; }
+        .decoration-6 { font-size: 1.3rem; animation-delay: 1.5s; }
+        .decoration-7 { font-size: 1.4rem; animation-delay: 2.5s; }
+        .decoration-8 { font-size: 1.7rem; animation-delay: 3.5s; }
+        
+        /* Hide decorations by default */
+        .theme-decoration {
+            display: none;
+        }
+        
+        /* Show decorations based on theme */
+        .theme-halloween .theme-decoration {
+            display: block;
+        }
+        
+        .theme-christmas .theme-decoration {
+            display: block;
+        }
+        
+        .theme-newyear .theme-decoration {
+            display: block;
+        }
+        
+        /* Regular theme - no decorations */
+        .theme-regular .theme-decoration {
+            display: none;
+        }
+        
+        /* Halloween wheel section colors */
+        .theme-halloween .wheel-section:nth-child(odd) {
+            background: linear-gradient(45deg, #8b0000, #ff4500);
+        }
+        
+        .theme-halloween .wheel-section:nth-child(even) {
+            background: linear-gradient(45deg, #2d1810, #8b4513);
+        }
+        
+        /* Halloween confetti */
+        .theme-halloween .confetti {
+            background: #ff6b35;
+        }
+        
+        .theme-halloween .celebration-icon {
+            color: #ff6b35;
+        }
+        
+        /* Christmas Theme */
+        .theme-christmas {
+            background: linear-gradient(135deg, #0d4f3c 0%, #1a5f3f 50%, #0d4f3c 100%);
+        }
+        
+        .theme-christmas .game-title h1 {
+            color: #ffd700;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .theme-christmas .roulette-wheel {
+            border: 6px solid #8b4513;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.4),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .theme-christmas .wheel-center {
+            background: linear-gradient(135deg, #ff0000 0%, #ffd700 100%);
+            border: 4px solid #ffffff;
+        }
+        
+        /* New Year Theme */
+        .theme-newyear {
+            background: linear-gradient(135deg, #000033 0%, #000066 50%, #000033 100%);
+        }
+        
+        .theme-newyear .game-title h1 {
+            color: #ffd700;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .theme-newyear .roulette-wheel {
+            border: 6px solid #ffd700;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.4),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .theme-newyear .wheel-center {
+            background: linear-gradient(135deg, #ffd700 0%, #ffffff 100%);
+            border: 4px solid #ffd700;
+        }
+        
+        /* Theme-specific Winner Animations */
+        
+        /* Halloween Spider Web Animation */
+        .halloween-spider-web {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .halloween-spider-web.show {
+            opacity: 1;
+        }
+        
+        .spider-web-line {
+            position: absolute;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.3));
+            border-radius: 2px;
+            animation: spiderWebGrow 2s ease-out;
+        }
+        
+        .spider-web-line.horizontal {
+            height: 2px;
+            width: 0;
+            animation: spiderWebGrowHorizontal 2s ease-out;
+        }
+        
+        .spider-web-line.vertical {
+            width: 2px;
+            height: 0;
+            animation: spiderWebGrowVertical 2s ease-out;
+        }
+        
+        .spider-web-line.diagonal {
+            width: 2px;
+            height: 0;
+            transform-origin: top left;
+            animation: spiderWebGrowDiagonal 2s ease-out;
+        }
+        
+        @keyframes spiderWebGrowHorizontal {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes spiderWebGrowVertical {
+            0% { height: 0; }
+            100% { height: 100%; }
+        }
+        
+        @keyframes spiderWebGrowDiagonal {
+            0% { height: 0; }
+            100% { height: 141.42%; }
+        }
+        
+        /* Christmas Snow Animation */
+        .christmas-snow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .christmas-snow.show {
+            opacity: 1;
+        }
+        
+        .snowflake {
+            position: absolute;
+            color: white;
+            font-size: 1.5rem;
+            animation: snowFall 3s linear infinite;
+            opacity: 0.8;
+        }
+        
+        @keyframes snowFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* New Year Fireworks Animation */
+        .newyear-fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .newyear-fireworks.show {
+            opacity: 1;
+        }
+        
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: fireworkExplode 2s ease-out;
+        }
+        
+        @keyframes fireworkExplode {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        .firework-trail {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            animation: fireworkTrail 1s ease-out;
+        }
+        
+        @keyframes fireworkTrail {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
+        <!-- Theme Decorations -->
+        <div class="theme-decoration decoration-1" style="top: 10%; left: 5%;">🎃</div>
+        <div class="theme-decoration decoration-2" style="top: 20%; right: 8%;">👻</div>
+        <div class="theme-decoration decoration-3" style="top: 60%; left: 3%;">🦇</div>
+        <div class="theme-decoration decoration-4" style="top: 70%; right: 5%;">🧙‍♀️</div>
+        <div class="theme-decoration decoration-5" style="top: 15%; left: 85%;">🎃</div>
+        <div class="theme-decoration decoration-6" style="top: 80%; right: 15%;">👻</div>
+        <div class="theme-decoration decoration-7" style="top: 30%; left: 90%;">🦇</div>
+        <div class="theme-decoration decoration-8" style="top: 50%; left: 2%;">🧙‍♀️</div>
+        
         <!-- Settings Button -->
         <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()">
             <i class="fas fa-cog"></i>
@@ -1204,6 +1572,17 @@
                 </div>
                 <input type="range" class="time-slider" id="spinningTimeSlider" min="1" max="60" value="4">
                 <div class="time-display" id="timeDisplay">4 seconds</div>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Theme Selection</label>
+                <select class="form-select" id="themeSelect" onchange="changeTheme(this.value)">
+                    <option value="regular">Regular (Current)</option>
+                    <option value="halloween">Halloween</option>
+                    <option value="christmas">Christmas</option>
+                    <option value="newyear">New Year</option>
+                </select>
+                <small class="text-muted">Choose a theme to change the appearance of the game.</small>
             </div>
             
             <div class="setting-item">
@@ -1283,6 +1662,11 @@
                 </div>
                 
                 
+                <!-- Theme-specific Winner Animations -->
+                <div class="halloween-spider-web" id="halloweenSpiderWeb"></div>
+                <div class="christmas-snow" id="christmasSnow"></div>
+                <div class="newyear-fireworks" id="newyearFireworks"></div>
+                
                 <!-- Winner Popup Overlay -->
                 <div class="winner-popup-overlay" id="winnerPopupOverlay">
                     <div class="winner-announcement" id="winnerAnnouncement">
@@ -1290,7 +1674,7 @@
                             <i class="fas fa-times"></i>
                         </button>
                         
-                        <div class="celebration-icons">
+                        <div class="celebration-icons" id="celebrationIcons">
                             <div class="celebration-icon">🎉</div>
                             <div class="celebration-icon">🏆</div>
                             <div class="celebration-icon">⭐</div>
@@ -1330,6 +1714,7 @@
             'bottom-right': null
         };
         let playButtonImage = null;
+        let currentTheme = 'regular';
         
         // Hide player list
         function hidePlayerList() {
@@ -1374,6 +1759,126 @@
             const settingsPanel = document.getElementById('settingsPanel');
             settingsVisible = false;
             settingsPanel.classList.remove('show');
+        }
+        
+        // Change theme
+        function changeTheme(theme) {
+            const body = document.body;
+            const themeSelect = document.getElementById('themeSelect');
+            
+            // Remove all theme classes
+            body.classList.remove('theme-regular', 'theme-halloween', 'theme-christmas', 'theme-newyear');
+            
+            // Add new theme class
+            body.classList.add(`theme-${theme}`);
+            
+            // Update current theme
+            currentTheme = theme;
+            
+            // Update theme select value
+            if (themeSelect) {
+                themeSelect.value = theme;
+            }
+            
+            // Update wheel sections with theme colors
+            updateWheelSectionsForTheme(theme);
+            
+            // Update celebration icons
+            updateCelebrationIcons(theme);
+            
+            // Update theme decorations
+            updateThemeDecorations(theme);
+            
+            console.log(`Theme changed to: ${theme}`);
+        }
+        
+        // Update wheel sections with theme colors
+        function updateWheelSectionsForTheme(theme) {
+            const wheel = document.getElementById('rouletteWheel');
+            if (!wheel) return;
+            
+            // Get all SVG paths (wheel sections)
+            const paths = wheel.querySelectorAll('svg path');
+            
+            paths.forEach((path, index) => {
+                if (theme === 'halloween') {
+                    if (index % 2 === 0) {
+                        path.setAttribute('fill', '#8b0000'); // Dark red
+                    } else {
+                        path.setAttribute('fill', '#2d1810'); // Dark brown
+                    }
+                } else if (theme === 'christmas') {
+                    if (index % 2 === 0) {
+                        path.setAttribute('fill', '#dc143c'); // Crimson
+                    } else {
+                        path.setAttribute('fill', '#228b22'); // Forest green
+                    }
+                } else if (theme === 'newyear') {
+                    if (index % 2 === 0) {
+                        path.setAttribute('fill', '#ffd700'); // Gold
+                    } else {
+                        path.setAttribute('fill', '#c0c0c0'); // Silver
+                    }
+                } else {
+                    // Regular theme
+                    if (index % 2 === 0) {
+                        path.setAttribute('fill', '#e74c3c'); // Red
+                    } else {
+                        path.setAttribute('fill', '#3498db'); // Blue
+                    }
+                }
+            });
+        }
+        
+        // Update celebration icons based on theme
+        function updateCelebrationIcons(theme) {
+            const celebrationIcons = document.getElementById('celebrationIcons');
+            if (!celebrationIcons) return;
+            
+            let icons;
+            if (theme === 'halloween') {
+                icons = ['🎃', '👻', '🦇', '🧙‍♀️', '🕷️', '💀'];
+            } else if (theme === 'christmas') {
+                icons = ['🎄', '🎁', '❄️', '🎅', '🤶', '🦌'];
+            } else if (theme === 'newyear') {
+                icons = ['🎊', '🎉', '🥳', '🍾', '⭐', '🎆'];
+            } else {
+                icons = ['🎉', '🏆', '⭐', '🎊', '🎈', '🎁'];
+            }
+            
+            // Update the celebration icons
+            const iconElements = celebrationIcons.querySelectorAll('.celebration-icon');
+            iconElements.forEach((element, index) => {
+                if (icons[index]) {
+                    element.textContent = icons[index];
+                }
+            });
+        }
+        
+        // Update theme decorations based on selected theme
+        function updateThemeDecorations(theme) {
+            const decorations = document.querySelectorAll('.theme-decoration');
+            
+            let decorationIcons;
+            if (theme === 'halloween') {
+                decorationIcons = ['🎃', '👻', '🦇', '🧙‍♀️', '🎃', '👻', '🦇', '🧙‍♀️'];
+            } else if (theme === 'christmas') {
+                decorationIcons = ['🎄', '🎁', '❄️', '🎅', '🤶', '🦌', '🌟', '🔔'];
+            } else if (theme === 'newyear') {
+                decorationIcons = ['🎊', '🎉', '🥳', '🍾', '⭐', '🎆', '💫', '✨'];
+            } else {
+                // Regular theme - no decorations
+                decorationIcons = ['', '', '', '', '', '', '', ''];
+            }
+            
+            // Update each decoration
+            decorations.forEach((decoration, index) => {
+                if (decorationIcons[index]) {
+                    decoration.textContent = decorationIcons[index];
+                } else {
+                    decoration.textContent = '';
+                }
+            });
         }
         
         // Toggle title editing
@@ -2015,11 +2520,32 @@
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 path.setAttribute('d', createPieSlicePath(centerX, centerY, radius, startAngle, endAngle));
                 
-                // Assign alternating colors for slices
-                if (i % 2 === 0) {
-                    path.setAttribute('fill', '#e74c3c'); // Red
+                // Assign alternating colors for slices based on current theme
+                if (currentTheme === 'halloween') {
+                    if (i % 2 === 0) {
+                        path.setAttribute('fill', '#8b0000'); // Dark red
+                    } else {
+                        path.setAttribute('fill', '#2d1810'); // Dark brown
+                    }
+                } else if (currentTheme === 'christmas') {
+                    if (i % 2 === 0) {
+                        path.setAttribute('fill', '#dc143c'); // Crimson
+                    } else {
+                        path.setAttribute('fill', '#228b22'); // Forest green
+                    }
+                } else if (currentTheme === 'newyear') {
+                    if (i % 2 === 0) {
+                        path.setAttribute('fill', '#ffd700'); // Gold
+                    } else {
+                        path.setAttribute('fill', '#c0c0c0'); // Silver
+                    }
                 } else {
-                    path.setAttribute('fill', '#3498db'); // Blue
+                    // Regular theme
+                    if (i % 2 === 0) {
+                        path.setAttribute('fill', '#e74c3c'); // Red
+                    } else {
+                        path.setAttribute('fill', '#3498db'); // Blue
+                    }
                 }
                 path.setAttribute('stroke', 'rgba(255,255,255,0.3)');
                 path.setAttribute('stroke-width', '2');
@@ -2228,14 +2754,14 @@
                     
                     if (winnerData) {
                         showWinner(winnerData.winner, winnerData.winnerNumber);
-                        createConfetti();
+                        createThemeWinnerAnimation();
                     }
                 } catch (error) {
                     console.error('Error checking custom winner:', error);
                     // Fallback to random selection
                     const actualWinner = calculateWinnerFromPosition(finalRotation);
                     showWinner(actualWinner.winner, actualWinner.winnerNumber);
-                    createConfetti();
+                    createThemeWinnerAnimation();
                 }
             }, spinningTime * 1000);
         }
@@ -2377,7 +2903,16 @@
         }
         
         function createConfetti() {
-            const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+            let colors;
+            if (currentTheme === 'halloween') {
+                colors = ['#ff6b35', '#8b0000', '#ffa500', '#2d1810', '#ff4500', '#8b4513'];
+            } else if (currentTheme === 'christmas') {
+                colors = ['#ffd700', '#dc143c', '#228b22', '#ffffff', '#ff6b6b', '#4ecdc4'];
+            } else if (currentTheme === 'newyear') {
+                colors = ['#ffd700', '#c0c0c0', '#ffffff', '#ff6b6b', '#4ecdc4', '#45b7d1'];
+            } else {
+                colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+            }
             
             for (let i = 0; i < 50; i++) {
                 setTimeout(() => {
@@ -2395,6 +2930,132 @@
                     }, 5000);
                 }, i * 50);
             }
+        }
+        
+        // Create theme-specific winner animations
+        function createThemeWinnerAnimation() {
+            if (currentTheme === 'halloween') {
+                createSpiderWebAnimation();
+            } else if (currentTheme === 'christmas') {
+                createSnowAnimation();
+            } else if (currentTheme === 'newyear') {
+                createFireworksAnimation();
+            } else {
+                createConfetti();
+            }
+        }
+        
+        // Halloween Spider Web Animation
+        function createSpiderWebAnimation() {
+            const spiderWeb = document.getElementById('halloweenSpiderWeb');
+            spiderWeb.classList.add('show');
+            
+            // Create spider web lines
+            const lines = [
+                { type: 'horizontal', top: '20%', left: '0%', width: '100%' },
+                { type: 'horizontal', top: '40%', left: '0%', width: '100%' },
+                { type: 'horizontal', top: '60%', left: '0%', width: '100%' },
+                { type: 'horizontal', top: '80%', left: '0%', width: '100%' },
+                { type: 'vertical', top: '0%', left: '20%', height: '100%' },
+                { type: 'vertical', top: '0%', left: '40%', height: '100%' },
+                { type: 'vertical', top: '0%', left: '60%', height: '100%' },
+                { type: 'vertical', top: '0%', left: '80%', height: '100%' },
+                { type: 'diagonal', top: '0%', left: '0%', transform: 'rotate(45deg)' },
+                { type: 'diagonal', top: '0%', left: '100%', transform: 'rotate(-45deg)' }
+            ];
+            
+            lines.forEach((line, index) => {
+                setTimeout(() => {
+                    const lineElement = document.createElement('div');
+                    lineElement.className = `spider-web-line ${line.type}`;
+                    lineElement.style.top = line.top;
+                    lineElement.style.left = line.left;
+                    if (line.width) lineElement.style.width = line.width;
+                    if (line.height) lineElement.style.height = line.height;
+                    if (line.transform) lineElement.style.transform = line.transform;
+                    
+                    spiderWeb.appendChild(lineElement);
+                }, index * 200);
+            });
+            
+            // Hide after animation
+            setTimeout(() => {
+                spiderWeb.classList.remove('show');
+                spiderWeb.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Christmas Snow Animation
+        function createSnowAnimation() {
+            const snowContainer = document.getElementById('christmasSnow');
+            snowContainer.classList.add('show');
+            
+            const snowflakes = ['❄️', '❅', '❆', '⛄'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const snowflake = document.createElement('div');
+                    snowflake.className = 'snowflake';
+                    snowflake.textContent = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                    snowflake.style.left = Math.random() * 100 + '%';
+                    snowflake.style.animationDelay = Math.random() * 3 + 's';
+                    snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    
+                    snowContainer.appendChild(snowflake);
+                    
+                    setTimeout(() => {
+                        snowflake.remove();
+                    }, 5000);
+                }, i * 100);
+            }
+            
+            // Hide after animation
+            setTimeout(() => {
+                snowContainer.classList.remove('show');
+                snowContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        // New Year Fireworks Animation
+        function createFireworksAnimation() {
+            const fireworksContainer = document.getElementById('newyearFireworks');
+            fireworksContainer.classList.add('show');
+            
+            const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3', '#54a0ff'];
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.style.left = Math.random() * 100 + '%';
+                    firework.style.top = Math.random() * 100 + '%';
+                    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    firework.style.animationDelay = Math.random() * 2 + 's';
+                    
+                    fireworksContainer.appendChild(firework);
+                    
+                    // Create trails
+                    for (let j = 0; j < 8; j++) {
+                        const trail = document.createElement('div');
+                        trail.className = 'firework-trail';
+                        trail.style.left = Math.random() * 20 - 10 + 'px';
+                        trail.style.top = Math.random() * 20 - 10 + 'px';
+                        trail.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        trail.style.animationDelay = Math.random() * 0.5 + 's';
+                        firework.appendChild(trail);
+                    }
+                    
+                    setTimeout(() => {
+                        firework.remove();
+                    }, 3000);
+                }, i * 200);
+            }
+            
+            // Hide after animation
+            setTimeout(() => {
+                fireworksContainer.classList.remove('show');
+                fireworksContainer.innerHTML = '';
+            }, 5000);
         }
         
         
@@ -2577,6 +3238,9 @@
             
             // Load saved settings
             loadSettings();
+            
+            // Initialize theme
+            changeTheme('regular');
             
             // Auto-focus the textarea
             playersTextarea.focus();
