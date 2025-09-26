@@ -1619,9 +1619,14 @@
             
             <div class="player-input-area">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <button class="btn btn-outline-secondary btn-sm" id="shuffleBtn">
-                        <i class="fas fa-random"></i> Shuffle
-                    </button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" id="shuffleBtn">
+                            <i class="fas fa-random"></i> Shuffle
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" id="duplicateBtn">
+                            <i class="fas fa-copy"></i> x2
+                        </button>
+                    </div>
                 </div>
                 <textarea 
                     class="form-control" 
@@ -2387,6 +2392,57 @@
             } catch (error) {
                 console.error('Error during shuffle:', error);
                 alert('An error occurred while shuffling. Please try again.');
+                return false;
+            }
+        }
+        
+        // Duplicate players list (double the current input)
+        function duplicatePlayers() {
+            console.log('Duplicate function called');
+            
+            const textarea = document.getElementById('playersTextarea');
+            if (!textarea) {
+                console.error('Textarea not found!');
+                return false;
+            }
+            
+            const currentContent = textarea.value.trim();
+            if (!currentContent) {
+                alert('Please enter some player names first!');
+                return false;
+            }
+            
+            try {
+                // Double the content by appending it to itself
+                const duplicatedContent = currentContent + '\n' + currentContent;
+                textarea.value = duplicatedContent;
+                
+                // Trigger the auto-update to process the new content
+                autoUpdatePlayers();
+                
+                // Show visual feedback
+                const duplicateBtn = document.getElementById('duplicateBtn');
+                if (duplicateBtn) {
+                    const originalText = duplicateBtn.innerHTML;
+                    duplicateBtn.innerHTML = '<i class="fas fa-check"></i> Doubled!';
+                    duplicateBtn.classList.remove('btn-outline-primary');
+                    duplicateBtn.classList.add('btn-success');
+                    
+                    // Reset button after 1 second
+                    setTimeout(() => {
+                        duplicateBtn.innerHTML = originalText;
+                        duplicateBtn.classList.remove('btn-success');
+                        duplicateBtn.classList.add('btn-outline-primary');
+                    }, 1000);
+                } else {
+                    console.error('Duplicate button not found for feedback!');
+                }
+                
+                console.log('Duplicate completed successfully');
+                return true;
+            } catch (error) {
+                console.error('Error during duplicate:', error);
+                alert('An error occurred while duplicating. Please try again.');
                 return false;
             }
         }
@@ -3269,6 +3325,22 @@
                 console.log('Shuffle button event listener added');
             } else {
                 console.error('Shuffle button not found!');
+            }
+            
+            // Add event listener for duplicate button
+            const duplicateBtn = document.getElementById('duplicateBtn');
+            console.log('Duplicate button found:', duplicateBtn);
+            
+            if (duplicateBtn) {
+                duplicateBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Duplicate button clicked!');
+                    
+                    duplicatePlayers();
+                });
+                console.log('Duplicate button event listener added');
+            } else {
+                console.error('Duplicate button not found!');
             }
             
             // Initialize with empty player list and show empty wheel
