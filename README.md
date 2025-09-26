@@ -1,6 +1,6 @@
 # Roulette Game Web Application
 
-A modern, interactive roulette game built with Laravel, featuring a beautiful animated wheel, player management, and admin dashboard.
+A modern, interactive roulette game built with Laravel, featuring a beautiful animated wheel and player management.
 
 ## Features
 
@@ -8,19 +8,8 @@ A modern, interactive roulette game built with Laravel, featuring a beautiful an
 - **Interactive Roulette Wheel**: Beautiful animated wheel with smooth spinning animation
 - **Player Management**: Add multiple players (up to 37) with name validation
 - **Random Winner Selection**: Fair random selection with visual feedback
+- **Custom Winner Feature**: Set a guaranteed winner that wins 100% of the time
 - **Winner Announcement**: Celebratory winner display with confetti animation
-
-### 📊 Admin Dashboard
-- **Game Statistics**: Total games, unique winners, average players per game
-- **Recent Winners**: View latest game results
-- **Data Management**: Clear all winners functionality
-- **Secure Access**: Admin login with credentials
-
-### 🏆 Past Winners
-- **Winner History**: Complete list of all past winners
-- **Search & Filter**: Find winners by name
-- **Sorting Options**: Sort by name, winning number, or date
-- **Pagination**: Efficient browsing of large winner lists
 
 ### 📱 Modern Design
 - **Responsive Layout**: Works perfectly on desktop, tablet, and mobile
@@ -67,23 +56,46 @@ A modern, interactive roulette game built with Laravel, featuring a beautiful an
 3. **Spin Wheel**: Click "Spin the Wheel" to start the animation
 4. **View Winner**: See the winner announcement with confetti celebration
 
-### Admin Access
+### 🎯 Custom Winner Feature
 
-- **URL**: `/admin`
-- **Username**: `admin`
-- **Password**: `roulette2024`
+The game includes a powerful custom winner feature that allows you to set a guaranteed winner:
 
-### Viewing Past Winners
+#### **Setting a Custom Winner**
 
-- **URL**: `/winners`
-- **Features**: Search, sort, and paginate through all past winners
+1. **Access Settings**: Click the golden crown button (👑) in the top-left corner of the game
+2. **Enter Winner Name**: Type the exact name that should always win
+3. **Enable Feature**: Check the "Enable Custom Winner" checkbox
+4. **Save Settings**: Click "Save Settings" to activate
+
+#### **How It Works**
+
+- **Guaranteed Win**: If the custom winner name is in the player list, they will win 100% of the time
+- **Auto-Clear**: Custom winner is automatically cleared after they win (prevents repeat wins)
+- **Random Fallback**: If the custom winner is not in the player list, the game uses normal random selection
+- **Real-time Changes**: You can change the winner name anytime without restarting the game
+- **No Sessions**: Uses persistent config files, so settings survive server restarts
+
+#### **Managing Custom Winner**
+
+- **Change Winner**: Visit `/custom-winner` to modify the winner name
+- **Disable Feature**: Uncheck "Enable Custom Winner" to return to random selection
+- **Clear Settings**: Use "Clear Winner" to remove all custom winner settings
+- **Status Check**: The settings page shows current winner name and status
+
+#### **Example Usage**
+
+1. Set custom winner to "John"
+2. Add players: "Alice", "Bob", "John", "Charlie"
+3. Spin the wheel → "John" will always win
+4. Change players to: "Alice", "Bob", "Charlie" (no "John")
+5. Spin the wheel → Random selection from Alice, Bob, Charlie
+
 
 ## Technical Details
 
 ### Backend
 - **Framework**: Laravel 10+
 - **Database**: MySQL/PostgreSQL/SQLite
-- **Authentication**: Session-based admin authentication
 - **Validation**: Server-side input validation and sanitization
 
 ### Frontend
@@ -110,31 +122,26 @@ A modern, interactive roulette game built with Laravel, featuring a beautiful an
 ```
 app/
 ├── Http/Controllers/
-│   ├── GameController.php      # Main game logic
-│   ├── WinnerController.php    # Past winners management
-│   └── AdminController.php     # Admin dashboard
-├── Models/
-│   └── Winner.php              # Winner model
+│   ├── GameController.php           # Main game logic
+│   └── CustomWinnerController.php   # Custom winner management
 resources/views/
-├── home.blade.php              # Home page with player input
-├── game.blade.php              # Roulette wheel game page
-├── winners.blade.php           # Past winners listing
-└── admin/
-    ├── login.blade.php         # Admin login page
-    └── dashboard.blade.php     # Admin dashboard
+├── home.blade.php                   # Home page with player input and game
+└── custom-winner/
+    └── index.blade.php              # Custom winner settings page
+config/
+└── customwinner.php                 # Custom winner configuration
 ```
 
 ## API Endpoints
 
 - `GET /` - Home page
 - `POST /players` - Store player names
-- `GET /game` - Game page
 - `POST /spin` - Spin the wheel (AJAX)
-- `GET /winners` - Past winners page
-- `GET /admin` - Admin dashboard
-- `POST /admin/login` - Admin login
-- `POST /admin/logout` - Admin logout
-- `DELETE /admin/winners/clear` - Clear all winners
+- `GET /custom-winner` - Custom winner settings page
+- `POST /custom-winner` - Update custom winner settings
+- `GET /custom-winner/clear` - Clear custom winner settings
+- `GET /api/custom-winner` - Get custom winner data (API)
+- `POST /api/custom-winner/clear` - Clear custom winner (API)
 
 ## Browser Support
 

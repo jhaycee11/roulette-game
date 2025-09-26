@@ -22,7 +22,7 @@
             justify-content: center;
             align-items: center;
             min-height: calc(100vh - 4rem);
-            padding: 2rem 0;
+            padding: .5rem 0;
             overflow-x: hidden;
             overflow-y: hidden;
             position: relative;
@@ -38,6 +38,7 @@
             position: relative;
             max-width: 1000px;
             width: 100%;
+            z-index: 10;
         }
         
         .player-section {
@@ -124,27 +125,6 @@
             transform: scale(1.1);
         }
         
-        .debug-btn {
-            position: fixed;
-            top: 20px;
-            left: 80px;
-            background: #17a2b8;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            z-index: 1000;
-        }
-        
-        .debug-btn:hover {
-            background: #138496;
-            transform: scale(1.1);
-        }
         
         .settings-panel {
             position: fixed;
@@ -305,6 +285,26 @@
             color: #6c757d;
         }
         
+        .upload-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .image-preview {
+            text-align: center;
+        }
+        
+        .image-preview img {
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview img:hover {
+            transform: scale(1.05);
+            border-color: #007bff !important;
+        }
+        
         .toggle-btn:hover {
             background: #c82333;
             transform: scale(1.1);
@@ -355,13 +355,53 @@
             font-style: italic;
         }
         
+        .player-count-display {
+            background: rgba(108, 117, 125, 0.1);
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .player-count-display.has-players {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+        
+        .player-count-display.insufficient {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+        
+        .player-count-display.limit-reached {
+            background: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+        
+        .player-input-area textarea.limit-reached {
+            border-color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+        
+        .player-input-area textarea.limit-reached:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
         .wheel-container {
             position: relative;
             width: 600px;
             height: 600px;
             margin: 2rem auto;
-            min-width: 500px;
-            min-height: 500px;
+            min-width: 700px;
+            min-height: 700px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -399,8 +439,8 @@
         }
         
         @keyframes slowSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from { transform: rotate(var(--current-rotation, 0deg)); }
+            to { transform: rotate(calc(var(--current-rotation, 0deg) + 360deg)); }
         }
         
         .wheel-section {
@@ -852,13 +892,6 @@
                 font-size: 1rem;
             }
             
-            .debug-btn {
-                top: 15px;
-                left: 65px;
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
             
             .settings-panel {
                 top: 60px;
@@ -930,6 +963,197 @@
                 font-size: 1rem;
             }
         }
+        
+        /* Editable Title Styles */
+        #gameTitle {
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            padding: 2px 4px;
+            margin: 0;
+        }
+        
+        #gameTitle.editing {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid #007bff;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        #editTitleBtn {
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        #editTitleBtn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        #editTitleBtn i {
+            font-size: 0.9rem;
+        }
+        
+        /* Focus styles for better UX */
+        #gameTitle:focus {
+            outline: none;
+        }
+        
+        /* Photo Upload Buttons */
+        .upload-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            opacity: 0.2;
+            overflow: hidden;
+        }
+        
+        .upload-btn:hover {
+            opacity: 0.6;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+        
+        .upload-btn.has-image {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .upload-btn.has-image:hover {
+            opacity: 1;
+            transform: none;
+        }
+        
+        .upload-btn i {
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        /* Image positioning for different quadrants - covering 50% of screen */
+        .upload-btn-top-left img {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: contain;
+            object-position: top left;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        .upload-btn-top-right img {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: contain;
+            object-position: top right;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        .upload-btn-bottom-left img {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: contain;
+            object-position: bottom left;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        .upload-btn-bottom-right img {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 50vw;
+            height: 50vh;
+            object-fit: contain;
+            object-position: bottom right;
+            border-radius: 0;
+            z-index: 5;
+        }
+        
+        /* Position upload buttons around the wheel */
+        .upload-btn-top-left {
+            top: 8em;
+            left: 13em;
+        }
+        
+        .upload-btn-top-right {
+            top: 8em;
+            right: 13em;
+        }
+        
+        .upload-btn-bottom-left {
+            bottom: 8em;
+            left: 13em;
+        }
+        
+        .upload-btn-bottom-right {
+            bottom: 8em;
+            right: 13em;
+        }
+        
+        /* Responsive sizing for upload buttons */
+        @media (max-width: 768px) {
+            .upload-btn {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .upload-btn i {
+                font-size: 1.2rem;
+            }
+            
+            .upload-btn-top-left,
+            .upload-btn-top-right {
+                top: 10px;
+            }
+            
+            .upload-btn-bottom-left,
+            .upload-btn-bottom-right {
+                bottom: 10px;
+            }
+            
+            .upload-btn-top-left,
+            .upload-btn-bottom-left {
+                left: 10px;
+            }
+            
+            .upload-btn-top-right,
+            .upload-btn-bottom-right {
+                right: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .upload-btn {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .upload-btn i {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -938,11 +1162,27 @@
         <button class="settings-btn" id="settingsBtn" onclick="toggleSettings()">
             <i class="fas fa-cog"></i>
         </button>
-        
-        <!-- Debug Button -->
-        <button class="debug-btn" id="debugBtn" onclick="showDebugInfo()">
-            <i class="fas fa-bug"></i>
+
+         <!-- Upload buttons positioned around the wheel -->
+         <button class="upload-btn upload-btn-top-left" onclick="triggerPhotoUpload('top-left')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadTopLeft" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'top-left')">
         </button>
+        <button class="upload-btn upload-btn-top-right" onclick="triggerPhotoUpload('top-right')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadTopRight" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'top-right')">
+        </button>
+        <button class="upload-btn upload-btn-bottom-left" onclick="triggerPhotoUpload('bottom-left')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadBottomLeft" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'bottom-left')">
+        </button>
+        <button class="upload-btn upload-btn-bottom-right" onclick="triggerPhotoUpload('bottom-right')">
+            <i class="fas fa-plus"></i>
+            <input type="file" id="photoUploadBottomRight" accept="image/*" style="display: none;" onchange="handlePhotoUpload(this, 'bottom-right')">
+        </button>
+                    
+        
+        
         
         <!-- Settings Panel -->
         <div class="settings-panel" id="settingsPanel">
@@ -964,6 +1204,23 @@
                 </div>
                 <input type="range" class="time-slider" id="spinningTimeSlider" min="1" max="60" value="4">
                 <div class="time-display" id="timeDisplay">4 seconds</div>
+            </div>
+            
+            <div class="setting-item">
+                <label class="setting-label">Custom Play Button Image</label>
+                <div class="upload-section">
+                    <input type="file" id="playButtonImageUpload" accept="image/*" style="display: none;" onchange="handlePlayButtonImageUpload(this)">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="triggerPlayButtonImageUpload()">
+                        <i class="fas fa-upload"></i> Upload Image
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm ms-2" id="removePlayButtonImage" onclick="removePlayButtonImage()" style="display: none;">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+                <div class="image-preview" id="playButtonImagePreview" style="display: none; margin-top: 0.5rem;">
+                    <img id="playButtonPreviewImg" src="" alt="Preview" style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 2px solid #e9ecef;">
+                </div>
+                <small class="text-muted">Upload a custom image for the play button. Recommended size: 100x100px or larger.</small>
             </div>
         </div>
         
@@ -990,10 +1247,13 @@
                 <textarea 
                     class="form-control" 
                     id="playersTextarea" 
-                    rows="10" 
+                    rows="20" 
                     placeholder="Enter player names"
                     style="resize: vertical; min-height: 300px; overflow-y: auto;"
                 ></textarea>
+                <div class="player-count-display" id="playerCountDisplay">
+                    <i class="fas fa-users"></i> <span id="playerCount">0</span> / 1,000 players
+                </div>
             </div>
         </div>
         
@@ -1001,7 +1261,14 @@
         <div class="game-section">
             <div class="game-content">
                 <div class="game-title">
-                    <h1><i class="fas fa-dice"></i> Roulette Game</h1>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <h1><i class="fas fa-dice"></i> <span id="gameTitle" contenteditable="false">Roulette Game</span></h1>
+                            <button type="button" class="btn btn-link p-0 ms-2" id="editTitleBtn" onclick="toggleTitleEdit()">
+                                <i class="fas fa-pencil-alt text-muted"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 
@@ -1011,13 +1278,6 @@
                     <div class="roulette-wheel slow-spin" id="rouletteWheel">
                         <div class="wheel-center" id="wheelCenter" onclick="spinWheel()">
                             <i class="fas fa-play" id="centerIcon"></i>
-                        </div>
-                        <div class="empty-wheel-message" id="emptyWheelMessage">
-                            <div class="empty-message-text">
-                                <i class="fas fa-plus-circle"></i><br>
-                                Add players to start spinning!<br>
-                                <small>Enter names in the textarea</small>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1061,6 +1321,15 @@
         let players = [];
         let settingsVisible = false;
         let spinningTime = 4; // Default spinning time in seconds
+        let isTitleEditing = false;
+        let originalTitle = '';
+        let uploadedPhotos = {
+            'top-left': null,
+            'top-right': null,
+            'bottom-left': null,
+            'bottom-right': null
+        };
+        let playButtonImage = null;
         
         // Hide player list
         function hidePlayerList() {
@@ -1107,6 +1376,260 @@
             settingsPanel.classList.remove('show');
         }
         
+        // Toggle title editing
+        function toggleTitleEdit() {
+            const titleElement = document.getElementById('gameTitle');
+            const editBtn = document.getElementById('editTitleBtn');
+            const editIcon = editBtn.querySelector('i');
+            
+            if (!isTitleEditing) {
+                // Start editing
+                originalTitle = titleElement.textContent;
+                titleElement.contentEditable = true;
+                titleElement.focus();
+                titleElement.classList.add('editing');
+                editIcon.className = 'fas fa-check text-success';
+                isTitleEditing = true;
+                
+                // Add event listeners for save/cancel
+                titleElement.addEventListener('blur', saveTitle);
+                titleElement.addEventListener('keydown', handleTitleKeydown);
+            } else {
+                // Save changes
+                saveTitle();
+            }
+        }
+        
+        // Save title changes
+        function saveTitle() {
+            const titleElement = document.getElementById('gameTitle');
+            const editBtn = document.getElementById('editTitleBtn');
+            const editIcon = editBtn.querySelector('i');
+            
+            titleElement.contentEditable = false;
+            titleElement.classList.remove('editing');
+            editIcon.className = 'fas fa-pencil-alt text-muted';
+            isTitleEditing = false;
+            
+            // Remove event listeners
+            titleElement.removeEventListener('blur', saveTitle);
+            titleElement.removeEventListener('keydown', handleTitleKeydown);
+        }
+        
+        // Handle keyboard events for title editing
+        function handleTitleKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveTitle();
+            } else if (event.key === 'Escape') {
+                event.preventDefault();
+                cancelTitleEdit();
+            }
+        }
+        
+        // Cancel title editing
+        function cancelTitleEdit() {
+            const titleElement = document.getElementById('gameTitle');
+            const editBtn = document.getElementById('editTitleBtn');
+            const editIcon = editBtn.querySelector('i');
+            
+            titleElement.textContent = originalTitle;
+            titleElement.contentEditable = false;
+            titleElement.classList.remove('editing');
+            editIcon.className = 'fas fa-pencil-alt text-muted';
+            isTitleEditing = false;
+            
+            // Remove event listeners
+            titleElement.removeEventListener('blur', saveTitle);
+            titleElement.removeEventListener('keydown', handleTitleKeydown);
+        }
+        
+        // Trigger photo upload
+        function triggerPhotoUpload(position) {
+            let inputId;
+            switch(position) {
+                case 'top-left':
+                    inputId = 'photoUploadTopLeft';
+                    break;
+                case 'top-right':
+                    inputId = 'photoUploadTopRight';
+                    break;
+                case 'bottom-left':
+                    inputId = 'photoUploadBottomLeft';
+                    break;
+                case 'bottom-right':
+                    inputId = 'photoUploadBottomRight';
+                    break;
+            }
+            const fileInput = document.getElementById(inputId);
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+        
+        // Handle photo upload
+        function handlePhotoUpload(input, position) {
+            const file = input.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedPhotos[position] = e.target.result;
+                    displayPhoto(position, e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+            // Clear the input value to allow re-uploading the same file
+            input.value = '';
+        }
+        
+        // Display uploaded photo
+        function displayPhoto(position, imageData) {
+            const button = document.querySelector(`.upload-btn-${position}`);
+            const icon = button.querySelector('i');
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = imageData;
+            
+            // Add has-image class for styling
+            button.classList.add('has-image');
+            
+            // Replace icon with image
+            icon.style.display = 'none';
+            button.appendChild(img);
+            
+            // Remove original onclick and add new click handler to remove photo
+            button.removeAttribute('onclick');
+            button.onclick = function() {
+                removePhoto(position);
+            };
+            
+            // Change cursor to indicate removal
+            button.style.cursor = 'pointer';
+            button.title = 'Click to remove photo';
+        }
+        
+        // Remove photo
+        function removePhoto(position) {
+            const button = document.querySelector(`.upload-btn-${position}`);
+            const img = button.querySelector('img');
+            const icon = button.querySelector('i');
+            
+            if (img) {
+                img.remove();
+            }
+            
+            // Remove has-image class
+            button.classList.remove('has-image');
+            
+            icon.style.display = 'block';
+            uploadedPhotos[position] = null;
+            
+            // Restore original click handler
+            button.onclick = function() {
+                triggerPhotoUpload(position);
+            };
+            
+            button.style.cursor = 'pointer';
+            button.title = '';
+        }
+        
+        // Trigger play button image upload
+        function triggerPlayButtonImageUpload() {
+            const fileInput = document.getElementById('playButtonImageUpload');
+            if (fileInput) {
+                fileInput.click();
+            }
+        }
+        
+        // Handle play button image upload
+        function handlePlayButtonImageUpload(input) {
+            const file = input.files[0];
+            if (file && file.type.startsWith('image/')) {
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Image size must be less than 5MB');
+                    input.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Check if this is the same image as before
+                    if (playButtonImage === e.target.result) {
+                        alert('This image is already uploaded!');
+                        input.value = '';
+                        return;
+                    }
+                    
+                    playButtonImage = e.target.result;
+                    displayPlayButtonImage(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid image file');
+                input.value = '';
+            }
+            // Clear the input value to allow re-uploading the same file
+            input.value = '';
+        }
+        
+        // Display play button image
+        function displayPlayButtonImage(imageData) {
+            const preview = document.getElementById('playButtonImagePreview');
+            const previewImg = document.getElementById('playButtonPreviewImg');
+            const removeBtn = document.getElementById('removePlayButtonImage');
+            
+            previewImg.src = imageData;
+            preview.style.display = 'block';
+            removeBtn.style.display = 'inline-block';
+            
+            // Update the actual play button
+            updatePlayButtonWithImage(imageData);
+        }
+        
+        // Update play button with custom image
+        function updatePlayButtonWithImage(imageData) {
+            const wheelCenter = document.getElementById('wheelCenter');
+            
+            // Store original content (default play icon)
+            if (!wheelCenter.dataset.originalContent) {
+                wheelCenter.dataset.originalContent = '<i class="fas fa-play" id="centerIcon"></i>';
+            }
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = imageData;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '50%';
+            
+            // Replace content with image only (no play icon)
+            wheelCenter.innerHTML = '';
+            wheelCenter.appendChild(img);
+        }
+        
+        // Remove play button image
+        function removePlayButtonImage() {
+            const preview = document.getElementById('playButtonImagePreview');
+            const removeBtn = document.getElementById('removePlayButtonImage');
+            const wheelCenter = document.getElementById('wheelCenter');
+            
+            // Hide preview and remove button
+            preview.style.display = 'none';
+            removeBtn.style.display = 'none';
+            
+            // Restore original play button with default icon
+            if (wheelCenter.dataset.originalContent) {
+                wheelCenter.innerHTML = wheelCenter.dataset.originalContent;
+            } else {
+                wheelCenter.innerHTML = '<i class="fas fa-play" id="centerIcon"></i>';
+            }
+            
+            playButtonImage = null;
+        }
+        
         // Validate spinning time input
         function validateSpinningTime(time) {
             const isValid = time >= 1 && time <= 60 && !isNaN(time);
@@ -1151,6 +1674,46 @@
         // Debounce timer for auto-updating
         let updateTimeout;
         
+        // Check if input should be restricted due to player limit
+        function shouldRestrictInput() {
+            const textarea = document.getElementById('playersTextarea');
+            const currentText = textarea.value.trim();
+            
+            if (!currentText) return false;
+            
+            const currentPlayers = currentText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+            
+            return currentPlayers.length >= 1000;
+        }
+
+        // Update player count display
+        function updatePlayerCountDisplay(playerCount) {
+            const countDisplay = document.getElementById('playerCountDisplay');
+            const countText = document.getElementById('playerCount');
+            const textarea = document.getElementById('playersTextarea');
+            
+            if (!countDisplay || !countText) return;
+            
+            countText.textContent = playerCount;
+            
+            // Update styling based on player count
+            countDisplay.classList.remove('has-players', 'insufficient', 'limit-reached');
+            textarea.classList.remove('limit-reached');
+            
+            if (playerCount === 0) {
+                // No players - default styling
+            } else if (playerCount >= 1000) {
+                countDisplay.classList.add('limit-reached');
+                textarea.classList.add('limit-reached');
+            } else if (playerCount < 2) {
+                countDisplay.classList.add('insufficient');
+            } else {
+                countDisplay.classList.add('has-players');
+            }
+        }
+
         // Auto-update players from textarea
         function autoUpdatePlayers() {
             const textarea = document.getElementById('playersTextarea');
@@ -1164,6 +1727,7 @@
                 if (!playerNames) {
                     // Clear players if textarea is empty
                     players = [];
+                    updatePlayerCountDisplay(0);
                     updateRouletteWheel();
                     hideGameControls();
                     
@@ -1174,9 +1738,20 @@
                 }
                 
                 // Parse player names from textarea (split by newlines and filter empty lines)
-                const newPlayers = playerNames.split('\n')
+                const allPlayers = playerNames.split('\n')
                     .map(name => name.trim())
                     .filter(name => name.length > 0);
+                
+                // Enforce 1,000 player limit
+                const newPlayers = allPlayers.slice(0, 1000);
+                
+                // If we had to truncate, update the textarea
+                if (allPlayers.length > 1000) {
+                    textarea.value = newPlayers.join('\n');
+                }
+                
+                // Update player count display
+                updatePlayerCountDisplay(newPlayers.length);
                 
                 if (newPlayers.length < 2) {
                     // Don't show game controls if less than 2 players
@@ -1212,14 +1787,17 @@
         // Show game controls
         function showGameControls() {
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = false;
-            centerIcon.className = 'fas fa-play';
+            
             document.getElementById('emptyWheelMessage').style.display = 'none';
             
             // Always start slow spin when not spinning
             if (!isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         }
@@ -1227,14 +1805,17 @@
         // Hide game controls
         function hideGameControls() {
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             wheelCenter.disabled = true;
-            centerIcon.className = 'fas fa-play';
+            
             document.getElementById('emptyWheelMessage').style.display = 'block';
             
             // Keep slow spin running even when no players (continuous animation)
             if (!isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         }
@@ -1274,6 +1855,9 @@
                 
                 // Update the roulette wheel with new order
                 updateRouletteWheel();
+                
+                // Update player count display (count should remain the same)
+                updatePlayerCountDisplay(players.length);
                 
                 // Show visual feedback
                 const shuffleBtn = document.getElementById('shuffleBtn');
@@ -1390,11 +1974,20 @@
             wheel.innerHTML = '<div class="wheel-center" id="wheelCenter" onclick="spinWheel()"><i class="fas fa-play" id="centerIcon"></i></div>';
             wheelSections = [];
             
+            // Restore custom image if it exists
+            if (playButtonImage) {
+                updatePlayButtonWithImage(playButtonImage);
+            }
+            
             // If no players, show empty wheel message
             if (totalSections === 0) {
                 wheel.innerHTML = `
                     <div class="wheel-center" id="wheelCenter" onclick="spinWheel()"><i class="fas fa-play" id="centerIcon"></i></div>
                 `;
+                // Restore custom image if it exists
+                if (playButtonImage) {
+                    updatePlayButtonWithImage(playButtonImage);
+                }
                 return;
             }
             
@@ -1501,6 +2094,10 @@
             
             // Ensure slow spin continues after wheel update
             if (!isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         }
@@ -1517,15 +2114,33 @@
             
             isSpinning = true;
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             const winnerAnnouncement = document.getElementById('winnerAnnouncement');
             
             wheelCenter.disabled = true;
-            centerIcon.className = 'fas fa-spinner fa-spin';
             
             // Hide previous winner announcement
             winnerAnnouncement.classList.remove('show');
+            
+            // Capture current rotation before starting spin
+            const computedStyle = window.getComputedStyle(wheel);
+            const currentTransform = computedStyle.transform;
+            let currentRotation = 0;
+            if (currentTransform && currentTransform !== 'none') {
+                const matrix = currentTransform.match(/matrix\(([^)]+)\)/);
+                if (matrix) {
+                    const values = matrix[1].split(',').map(v => parseFloat(v.trim()));
+                    if (values.length >= 4) {
+                        const a = values[0];
+                        const b = values[1];
+                        currentRotation = Math.atan2(b, a) * (180 / Math.PI);
+                        if (currentRotation < 0) currentRotation += 360;
+                    }
+                }
+            }
+            
+            // Store current rotation for later use
+            wheel.dataset.currentRotation = currentRotation;
             
             // Remove slow spin and add spinning class
             wheel.classList.remove('slow-spin');
@@ -1556,52 +2171,72 @@
                 wheel.classList.add('blur-effect');
             }
             
-            // Store winner data for later display
-            let winnerData = null;
-            
-            // Call backend to get winner (considering Next to Win logic)
-            fetch('{{ route("spin") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    players: players
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    console.error('Error from backend:', data.error);
-                    // Fallback to frontend calculation
-                    winnerData = calculateWinnerFromPosition(finalRotation);
-                } else {
-                    // Use backend-determined winner
-                    console.log('Backend winner:', data.winner);
-                    console.log('Next to Win used:', data.next_to_win_used);
-                    winnerData = {
-                        winner: data.winner,
-                        winnerNumber: data.winning_number
-                    };
-                }
-            })
-            .catch(error => {
-                console.error('Error calling backend:', error);
-                // Fallback to frontend calculation
-                winnerData = calculateWinnerFromPosition(finalRotation);
-            });
-            
-            // Show winner after animation completes (use custom spinning time)
-            setTimeout(() => {
-                if (winnerData) {
-                    showWinner(winnerData.winner, winnerData.winnerNumber);
-                } else {
-                    // Final fallback
+            // Check for custom winner via API and show winner after animation completes
+            setTimeout(async () => {
+                try {
+                    // Call custom winner API to get latest settings
+                    const customWinnerResponse = await fetch('/api/custom-winner');
+                    const customWinnerData = await customWinnerResponse.json();
+                    
+                    let winnerData = null;
+                    
+                    // Check if custom winner is enabled and exists in players
+                    if (customWinnerData.success && 
+                        customWinnerData.data.enabled && 
+                        customWinnerData.data.winner_name && 
+                        players.includes(customWinnerData.data.winner_name)) {
+                        
+                        // Custom winner is in the player list - they win!
+                        const winnerIndex = players.indexOf(customWinnerData.data.winner_name);
+                        winnerData = {
+                            winner: customWinnerData.data.winner_name,
+                            winnerNumber: winnerIndex
+                        };
+                        
+                        console.log('Custom winner used:', customWinnerData.data.winner_name);
+                        console.log('Custom winner data:', customWinnerData);
+                        
+                        // Automatically clear the custom winner after they win
+                        try {
+                            const clearResponse = await fetch('/api/custom-winner/clear', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                }
+                            });
+                            
+                            if (clearResponse.ok) {
+                                console.log('Custom winner cleared automatically after winning');
+                            } else {
+                                console.warn('Failed to clear custom winner automatically');
+                            }
+                        } catch (clearError) {
+                            console.error('Error clearing custom winner:', clearError);
+                        }
+                    } else {
+                        // No custom winner or not in player list - use random selection
+                        winnerData = calculateWinnerFromPosition(finalRotation);
+                        console.log('Random selection used');
+                        console.log('Custom winner check result:', {
+                            success: customWinnerData.success,
+                            enabled: customWinnerData.data?.enabled,
+                            winner_name: customWinnerData.data?.winner_name,
+                            in_players: players.includes(customWinnerData.data?.winner_name || '')
+                        });
+                    }
+                    
+                    if (winnerData) {
+                        showWinner(winnerData.winner, winnerData.winnerNumber);
+                        createConfetti();
+                    }
+                } catch (error) {
+                    console.error('Error checking custom winner:', error);
+                    // Fallback to random selection
                     const actualWinner = calculateWinnerFromPosition(finalRotation);
                     showWinner(actualWinner.winner, actualWinner.winnerNumber);
+                    createConfetti();
                 }
-                createConfetti();
             }, spinningTime * 1000);
         }
         
@@ -1699,16 +2334,45 @@
         
         function resetButton() {
             const wheelCenter = document.getElementById('wheelCenter');
-            const centerIcon = document.getElementById('centerIcon');
             const wheel = document.getElementById('rouletteWheel');
             
             isSpinning = false;
             wheelCenter.disabled = false;
-            centerIcon.className = 'fas fa-play';
+            
             wheel.classList.remove('spinning');
             wheel.classList.remove('blur-effect');
             
-            // Always restart slow spin (continuous animation)
+            // Get current rotation from stored value or computed style
+            let currentRotation = 0;
+            
+            // First try to get from stored rotation (from when spin started)
+            if (wheel.dataset.currentRotation) {
+                currentRotation = parseFloat(wheel.dataset.currentRotation);
+            } else {
+                // Fallback to computed style
+                const computedStyle = window.getComputedStyle(wheel);
+                const currentTransform = computedStyle.transform;
+                
+                if (currentTransform && currentTransform !== 'none') {
+                    const matrix = currentTransform.match(/matrix\(([^)]+)\)/);
+                    if (matrix) {
+                        const values = matrix[1].split(',').map(v => parseFloat(v.trim()));
+                        if (values.length >= 4) {
+                            // Calculate rotation from matrix
+                            const a = values[0];
+                            const b = values[1];
+                            currentRotation = Math.atan2(b, a) * (180 / Math.PI);
+                            if (currentRotation < 0) currentRotation += 360;
+                        }
+                    }
+                }
+            }
+            
+            // Set the current rotation as the starting point for slow-spin
+            wheel.style.setProperty('--current-rotation', `${currentRotation}deg`);
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+            
+            // Always restart slow spin (continuous animation) from current position
             wheel.classList.add('slow-spin');
         }
         
@@ -1733,79 +2397,7 @@
             }
         }
         
-        function showDebugInfo() {
-            // Try backend first, fallback to client-side if it fails
-            fetch('{{ route("admin.debug.next.to.win") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({
-                    players: players
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                let debugInfo = '=== 🎯 NEXT TO WIN DEBUG INFO ===\n\n';
-                
-                // Summary
-                debugInfo += `📊 SUMMARY:\n`;
-                debugInfo += `• Next to Win entries: ${data.count}\n`;
-                debugInfo += `• Current players: ${data.playerCount}\n`;
-                debugInfo += `• Available in players: ${data.availableCount}\n`;
-                debugInfo += `• NOT in players: ${data.notAvailableCount}\n\n`;
-                
-                if (data.nextToWin && data.nextToWin.length > 0) {
-                    debugInfo += `=== NEXT TO WIN LIST ===\n\n`;
-                    
-                    data.comparison.forEach((item) => {
-                        const status = item.is_in_players ? '✅ IN PLAYERS' : '❌ NOT IN PLAYERS';
-                        debugInfo += `${item.index}. "${item.name}" ${status}\n`;
-                        debugInfo += `   Added by: ${item.added_by}\n`;
-                        debugInfo += `   Added at: ${item.added_at}\n\n`;
-                    });
-                    
-                    if (data.availableInPlayers.length > 0) {
-                        debugInfo += `=== AVAILABLE IN PLAYERS ===\n`;
-                        debugInfo += data.availableInPlayers.join(', ') + '\n\n';
-                    }
-                    
-                    if (data.notInPlayers.length > 0) {
-                        debugInfo += `=== NOT IN PLAYERS ===\n`;
-                        debugInfo += data.notInPlayers.join(', ') + '\n\n';
-                    }
-                } else {
-                    debugInfo += 'No entries in Next to Win list.\n\n';
-                }
-                
-                if (data.players && data.players.length > 0) {
-                    debugInfo += `=== CURRENT PLAYER LIST ===\n`;
-                    debugInfo += data.players.join(', ') + '\n\n';
-                } else {
-                    debugInfo += 'No players in current game.\n\n';
-                }
-                
-                debugInfo += '=== Raw JSON Data ===\n';
-                debugInfo += JSON.stringify(data, null, 2);
-                
-                // Show debug info
-                alert(debugInfo);
-                
-                // Also log to console
-                console.log('=== NEXT TO WIN DEBUG ===', data);
-            })
-            .catch(error => {
-                console.error('Backend debug failed:', error);
-                // Fallback to client-side debug
-                showFallbackDebugInfo();
-            });
-        }
+        
         
         // Comprehensive debug function that works without backend
         function showFallbackDebugInfo() {
@@ -1870,17 +2462,10 @@
             debugInfo += `• Memory usage: ${performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB' : 'N/A'}\n`;
             debugInfo += `• Load time: ${Math.round(performance.now())}ms\n\n`;
             
-            // Next to Win info (if available)
-            debugInfo += `🎯 NEXT TO WIN INFO:\n`;
-            debugInfo += `• Backend route: {{ route("admin.debug.next.to.win") }}\n`;
-            debugInfo += `• Note: Backend debug not available in production\n`;
-            debugInfo += `• Check server logs for Next to Win data\n\n`;
-            
             debugInfo += `💡 TROUBLESHOOTING:\n`;
             debugInfo += `• If shuffle button not working: Check if players >= 2\n`;
             debugInfo += `• If wheel not spinning: Check if players exist\n`;
             debugInfo += `• If settings not opening: Check for JavaScript errors\n`;
-            debugInfo += `• For Next to Win: Check server logs or admin panel\n`;
             
             // Show debug info
             alert(debugInfo);
@@ -1926,6 +2511,24 @@
             playersTextarea.addEventListener('paste', function() {
                 // Wait for paste to complete, then update
                 setTimeout(autoUpdatePlayers, 10);
+            });
+            
+            // Prevent input when player limit is reached
+            playersTextarea.addEventListener('keydown', function(e) {
+                // Allow backspace, delete, arrow keys, and other navigation keys
+                const allowedKeys = [
+                    'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                    'Home', 'End', 'PageUp', 'PageDown', 'Tab', 'Enter'
+                ];
+                
+                if (allowedKeys.includes(e.key)) {
+                    return; // Allow these keys
+                }
+                
+                // Check if we're at the limit
+                if (shouldRestrictInput()) {
+                    e.preventDefault();
+                }
             });
             
             // Settings event listeners
@@ -2006,12 +2609,17 @@
             
             // Initialize with empty player list and show empty wheel
             players = [];
+            updatePlayerCountDisplay(0);
             updateRouletteWheel();
             hideGameControls();
             
             // Ensure slow spin is active (it's already in HTML, but make sure it's not removed)
             const wheel = document.getElementById('rouletteWheel');
             if (wheel && !isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         });

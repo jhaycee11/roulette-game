@@ -3,28 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File;
 
 class GameController extends Controller
 {
-    private function loadNextToWinFromFile()
-    {
-        $filePath = public_path('storage/save/nexttowin.json');
-        
-        if (!File::exists($filePath)) {
-            return [];
-        }
-        
-        try {
-            $content = File::get($filePath);
-            $data = json_decode($content, true);
-            return is_array($data) ? $data : [];
-        } catch (\Exception $e) {
-            return [];
-        }
-    }
+    
+    
+    
+    
     public function index()
     {
         return view('home');
@@ -77,52 +63,20 @@ class GameController extends Controller
             return response()->json(['error' => 'No players found'], 400);
         }
 
-        // Check if there's a "Next to Win" list and if any names are in the current players list
-        $nextToWin = $this->loadNextToWinFromFile();
-        $nextToWinUsed = false;
-        $targetWinner = null;
-        
-        // Debug logging
-        \Log::info('Next to Win Debug', [
-            'nextToWin' => $nextToWin,
-            'players' => $players,
-            'nextToWinCount' => count($nextToWin)
-        ]);
-        
-        // Always check if any "Next to Win" names exist in the current players list
-        if (!empty($nextToWin)) {
-            $availableNextToWin = [];
-            foreach ($nextToWin as $nextToWinEntry) {
-                if (in_array($nextToWinEntry['name'], $players)) {
-                    $availableNextToWin[] = $nextToWinEntry['name'];
-                }
-            }
-            
-            \Log::info('Next to Win Match Check', [
-                'availableNextToWin' => $availableNextToWin,
-                'availableCount' => count($availableNextToWin)
-            ]);
-            
-            // If any "Next to Win" names are in the players list, guarantee one of them wins
-            if (!empty($availableNextToWin)) {
-                $nextToWinUsed = true;
-                $targetWinner = $availableNextToWin[rand(0, count($availableNextToWin) - 1)];
-                \Log::info('Next to Win Used', [
-                    'targetWinner' => $targetWinner,
-                    'nextToWinUsed' => $nextToWinUsed
-                ]);
-            }
-        }
-        
         // Create wheel sections (shuffle for visual randomness)
         $wheelSections = $players;
         shuffle($wheelSections);
         
-        // Determine the winning section and winner
-        if ($nextToWinUsed && $targetWinner) {
-            // Find the target winner's position in the shuffled wheel
-            $winningSection = array_search($targetWinner, $wheelSections);
-            $winner = $targetWinner;
+        // Check for custom winner
+        $customWinnerName = config('customwinner.winner_name', '');
+        
+        $winner = null;
+        $winningSection = null;
+        
+        // If custom winner name is set and in the players list, use it
+        if (!empty($customWinnerName) && in_array($customWinnerName, $players)) {
+            $winner = $customWinnerName;
+            $winningSection = array_search($customWinnerName, $wheelSections);
         } else {
             // Random selection from current players
             $winningSection = rand(0, count($players) - 1);
@@ -132,8 +86,8 @@ class GameController extends Controller
         return response()->json([
             'winner' => $winner,
             'winning_number' => $winningSection,
-            'wheel_sections' => $wheelSections,
-            'next_to_win_used' => $nextToWinUsed
+            'wheel_sections' => $wheelSections
         ]);
     }
+    
 }
