@@ -439,8 +439,8 @@
         }
         
         @keyframes slowSpin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from { transform: rotate(var(--current-rotation, 0deg)); }
+            to { transform: rotate(calc(var(--current-rotation, 0deg) + 360deg)); }
         }
         
         .wheel-section {
@@ -1794,6 +1794,10 @@
             
             // Always start slow spin when not spinning
             if (!isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         }
@@ -1808,6 +1812,10 @@
             
             // Keep slow spin running even when no players (continuous animation)
             if (!isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         }
@@ -2086,6 +2094,10 @@
             
             // Ensure slow spin continues after wheel update
             if (!isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         }
@@ -2109,6 +2121,26 @@
             
             // Hide previous winner announcement
             winnerAnnouncement.classList.remove('show');
+            
+            // Capture current rotation before starting spin
+            const computedStyle = window.getComputedStyle(wheel);
+            const currentTransform = computedStyle.transform;
+            let currentRotation = 0;
+            if (currentTransform && currentTransform !== 'none') {
+                const matrix = currentTransform.match(/matrix\(([^)]+)\)/);
+                if (matrix) {
+                    const values = matrix[1].split(',').map(v => parseFloat(v.trim()));
+                    if (values.length >= 4) {
+                        const a = values[0];
+                        const b = values[1];
+                        currentRotation = Math.atan2(b, a) * (180 / Math.PI);
+                        if (currentRotation < 0) currentRotation += 360;
+                    }
+                }
+            }
+            
+            // Store current rotation for later use
+            wheel.dataset.currentRotation = currentRotation;
             
             // Remove slow spin and add spinning class
             wheel.classList.remove('slow-spin');
@@ -2310,7 +2342,37 @@
             wheel.classList.remove('spinning');
             wheel.classList.remove('blur-effect');
             
-            // Always restart slow spin (continuous animation)
+            // Get current rotation from stored value or computed style
+            let currentRotation = 0;
+            
+            // First try to get from stored rotation (from when spin started)
+            if (wheel.dataset.currentRotation) {
+                currentRotation = parseFloat(wheel.dataset.currentRotation);
+            } else {
+                // Fallback to computed style
+                const computedStyle = window.getComputedStyle(wheel);
+                const currentTransform = computedStyle.transform;
+                
+                if (currentTransform && currentTransform !== 'none') {
+                    const matrix = currentTransform.match(/matrix\(([^)]+)\)/);
+                    if (matrix) {
+                        const values = matrix[1].split(',').map(v => parseFloat(v.trim()));
+                        if (values.length >= 4) {
+                            // Calculate rotation from matrix
+                            const a = values[0];
+                            const b = values[1];
+                            currentRotation = Math.atan2(b, a) * (180 / Math.PI);
+                            if (currentRotation < 0) currentRotation += 360;
+                        }
+                    }
+                }
+            }
+            
+            // Set the current rotation as the starting point for slow-spin
+            wheel.style.setProperty('--current-rotation', `${currentRotation}deg`);
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+            
+            // Always restart slow spin (continuous animation) from current position
             wheel.classList.add('slow-spin');
         }
         
@@ -2554,6 +2616,10 @@
             // Ensure slow spin is active (it's already in HTML, but make sure it's not removed)
             const wheel = document.getElementById('rouletteWheel');
             if (wheel && !isSpinning) {
+                // Set initial rotation if not already set
+                if (!wheel.style.getPropertyValue('--current-rotation')) {
+                    wheel.style.setProperty('--current-rotation', '0deg');
+                }
                 wheel.classList.add('slow-spin');
             }
         });
